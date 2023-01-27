@@ -1,0 +1,9 @@
+@import './base.css';
+
+.v-card-item__prepend {
+    padding-inline-end: 0.625rem;
+}
+
+.v-card-item__content {
+    align-self: stretch;
+}
