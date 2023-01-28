@@ -12,7 +12,17 @@
                 { title: "Morale: Low to high", value: "combined_morale_per_50t" },
                 { title: "Morale: High to low", value: "-combined_morale_per_50t" },
             ],
-            rationsOptions: [ "Yes", "No" ],
+            rationOptions: [ "Yes", "No" ],
+            bonusOptions: [
+                { title: "Crafting", value: "bonuses.crafting" },
+                { title: "Diplomacy", value: "bonuses.diplomacy" },
+                { title: "Faith", value: "bonuses.faith" },
+                { title: "Force", value: "bonuses.force" },
+                { title: "Hunting", value: "bonuses.hunting" },
+                { title: "Medicine", value: "bonuses.medicine" },
+                { title: "Naval Power", value: "bonuses.naval_power" },
+                { title: "Navigation", value: "bonuses.navigation" },
+            ],
             supplies: [],
             goodsPerRow: 4
         }),
@@ -49,17 +59,25 @@
             </v-col>
             <v-col cols="3">
                 <v-select
-                    :items="rationsOptions"
+                    :items="rationOptions"
                     variant="underlined"
                     density="compact"
-                    label="Type"
+                    label="Ration"
+                    item-value="value" />
+            </v-col>
+            <v-col cols="3">
+                <v-select
+                    :items="bonusOptions"
+                    variant="underlined"
+                    density="compact"
+                    label="Expedition Bonus"
                     item-value="value" />
             </v-col>
         </v-row>
     </v-container>
     <v-container class="content items pa-0">
         <template v-if="supplies.length === 0">
-            <v-progress-circular indeterminate :size="50" :color="primary" />
+            <v-progress-circular indeterminate :size="50" />
         </template>
         <template v-else>
             <v-row justify="start" v-for="itemsForRow in SuppliesChunks">

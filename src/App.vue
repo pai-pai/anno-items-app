@@ -15,7 +15,7 @@
 
 <template>
   <v-app>
-    <v-app-bar app extended>
+    <v-app-bar app >
       <v-toolbar-title class="ml-0">
         <v-container class="pa-0">
           <router-link to="/">Anno 1800 Expeditions</router-link>

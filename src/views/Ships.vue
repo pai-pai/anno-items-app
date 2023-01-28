@@ -58,7 +58,7 @@
     </v-container>
     <v-container class="content items pa-0">
         <template v-if="ships.length === 0">
-            <v-progress-circular indeterminate :size="50" :color="primary" />
+            <v-progress-circular indeterminate :size="50" />
         </template>
         <template v-else>
             <v-row justify="start" v-for="itemsForRow in ShipsChunks">

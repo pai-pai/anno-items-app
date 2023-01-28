@@ -30,7 +30,7 @@
         <v-card class="ship-card fill-height" variant="outlined">
             <v-card-item class="card-header">
                 <template v-slot:prepend>
-                    <div :class="item-bage">
+                    <div class="item-bage">
                         <v-img
                             aspect-ratio="1"
                             height="3.125rem"

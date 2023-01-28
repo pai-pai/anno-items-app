@@ -7,3 +7,7 @@
 .v-card-item__content {
     align-self: stretch;
 }
+
+.control-panel .bonuses [class*=columns-block-column-] {
+    padding-right: 4rem !important;
+}
