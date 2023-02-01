@@ -1,12 +1,12 @@
 <script>
     export default {
         name: "ColumnRow",
-        props: [ "label", "value" ],
+        props: [ "cols", "label", "value" ],
     }
 </script>
 
 <template>
-    <v-col cols="6">
+    <v-col :cols="cols">
         <template v-if="label || value">
             <v-row no-gutters>
                 <v-col cols="10" class="label">{{ label }}</v-col>

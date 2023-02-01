@@ -1,11 +1,76 @@
 @import './base.css';
 
-.v-card-item__prepend {
-    padding-inline-end: 0.625rem;
+.primary-text-color {
+    color: #574D44;
 }
 
-.v-card-item__content {
-    align-self: stretch;
+.secondary-text-color {
+    color: #968878;
+}
+
+.background-color-light {
+    background: #FFFEFB;
+}
+
+.header-text {
+    font-size: 1.75rem;
+}
+
+.regular-text {
+    font-size: 1rem;
+    line-height: 120%;
+}
+
+.small-text {
+    font-size: 0.875rem;
+}
+
+.smallest-text {
+    font-size: 0.75rem;
+}
+
+ul.flat-list li {
+    display: inline;
+}
+
+.anno-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.625rem;
+    border: 1px solid #E4DAC8;
+    border-radius: 0.25rem;
+    box-sizing: border-box;
+}
+
+.anno-card.dense {
+    padding: 0.5rem;
+}
+
+.anno-card > div {
+    width: 100%;
+}
+
+.anno-card .header {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0 0 0.5rem;
+    gap: 0.625rem;
+}
+
+.anno-card ul {
+    list-style-type: none;
+}
+
+.underlined-bottom {
+    border-bottom: 1px solid #E4DAC8;
+}
+
+.v-toolbar__extension {
+    background-color: #FFFEFB;
 }
 
 .control-panel .bonuses [class*=columns-block-column-] {

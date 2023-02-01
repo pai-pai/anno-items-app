@@ -1,7 +1,7 @@
 <script>
-    import lodash from 'lodash';
+    import lodash from "lodash";
     import axios from "axios";
-    import ItemCard from '../components/ItemCard.vue';
+    import ItemCard from "../components/ItemCard.vue";
 
     export default {
         data: () => ({
@@ -28,8 +28,9 @@
             ItemCard
         },
         computed: {
-            ItemsChunks() {
-                return lodash.chunk(Object.values(this.items), this.itemsPerRow);
+            ItemsChunksWithId() {
+                const arr = lodash.chunk(Object.values(this.items), this.itemsPerRow);
+                return arr.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
             }
         },
         methods: {
@@ -79,16 +80,45 @@
             </v-col>
         </v-row>
     </v-container>
+
     <v-container class="content items pa-0">
         <template v-if="items.length === 0">
             <v-progress-circular indeterminate :size="50" />
         </template>
         <template v-else>
-            <v-row justify="start" v-for="itemsForRow in ItemsChunks">
-                <v-col cols="3" class="pa-2" align-self="stretch" v-for="item in itemsForRow">
-                    <ItemCard :item="item" class="fill-height" />
-                </v-col>
-            </v-row>
+            <DynamicScroller
+                :items="ItemsChunksWithId"
+                keyField="id"
+                :min-item-size="54"
+                class="scroller"
+            >
+                <template v-slot="{ item, index, active }">
+                    <DynamicScrollerItem
+                        :item="item"
+                        :active="active"
+                        :data-index="index"
+                    >
+                    <div class="items-row">
+                        <div class="item-in-row" v-for="it in item.rowData">
+                            <ItemCard :item="it" class="fill-height" />
+                        </div>
+                    </div>
+                    </DynamicScrollerItem>
+                </template>
+            </DynamicScroller>
         </template>
     </v-container>
 </template>
+
+<style scoped>
+    .scroller {
+        height: 100%;
+    }
+
+    .items-row {
+        display: grid;
+        grid-gap: 1.25rem;
+        grid-template-columns: repeat(4, 1fr);
+        padding-bottom: 1.25rem;
+    }
+</style>

@@ -1,0 +1,49 @@
+@font-face {
+  font-family: 'anno-icons';
+  src:  url('fonts/anno-icons.eot?hfjjyu');
+  src:  url('fonts/anno-icons.eot?hfjjyu#iefix') format('embedded-opentype'),
+    url('fonts/anno-icons.ttf?hfjjyu') format('truetype'),
+    url('fonts/anno-icons.woff?hfjjyu') format('woff'),
+    url('fonts/anno-icons.svg?hfjjyu#anno-icons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.ic {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'anno-icons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-crafting:before {
+  content: "\e900";
+}
+.icon-faith:before {
+  content: "\e901";
+}
+.icon-diplomacy:before {
+  content: "\e902";
+}
+.icon-force:before {
+  content: "\e903";
+}
+.icon-hunting:before {
+  content: "\e904";
+}
+.icon-medicine:before {
+  content: "\e905";
+}
+.icon-naval_power:before {
+  content: "\e906";
+}
+.icon-navigation:before {
+  content: "\e907";
+}

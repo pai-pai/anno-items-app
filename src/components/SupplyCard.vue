@@ -1,11 +1,15 @@
 <script>
     import { BONUSES_MAPPING } from '../constants';
-    import ColumnsBlock from './ColumnsBlock.vue';
+    import AnnoCard from './basic/AnnoCard.vue';
+    import Bage from './basic/Bage.vue';
+    import ColumnsBlock from './basic/ColumnsBlock.vue';
     
     export default {
         name: "SupplyCard",
         props: [ "item" ],
         components: {
+            AnnoCard,
+            Bage,
             ColumnsBlock,
         },
         computed: {
@@ -29,81 +33,22 @@
 
 <template>
     <v-lazy :options="{ threshold: .5 }" transition="fade-transition">
-        <v-card class="supply-card fill-height" variant="outlined">
-            <v-card-item class="card-header">
-                <template v-slot:prepend>
-                    <div class="item-bage">
-                        <v-img
-                            aspect-ratio="1"
-                            height="3.125rem"
-                            width="3.125rem"
-                            :src="item.image_url"
-                        />
-                    </div>
-                </template>
-                <v-card-title class="item-name font-weight-bold align-self-stretch">
-                    {{ item.name }}
-                </v-card-title>
-                <template v-if="item.extra_rations">
-                    <v-card-subtitle class="item-traits font-italic">Ration</v-card-subtitle>
-                </template>
-            </v-card-item>
+        <AnnoCard>
+            <div class="header underlined-bottom">
+                <Bage
+                    :image_src="item.image_src"
+                    height="3.125rem"
+                    width="3.125rem"
+                />
+                <div>
+                    <p class="regular-text font-weight-bold">{{ item.name }}</p>
+                    <template v-if="item.extra_rations">
+                        <p class="smallest-text font-italic">Ration</p>
+                    </template>
+                </div>
+            </div>
             
-            <v-card-text>
-                <ColumnsBlock :columnsConfig="SupplyColumnsConfig" />  
-            </v-card-text>
-        </v-card>
+            <ColumnsBlock :columnsConfig="SupplyColumnsConfig" />
+        </AnnoCard>
     </v-lazy>
   </template>
-
-
-<style scoped>
-    .supply-card {
-        padding: 0.625rem;
-    }
-
-    .card-header {
-        padding: 0 0 0.5rem 0;
-        border-bottom: 1px solid #E4DAC8;
-    }
-
-    .item-bage {
-        padding: 0.3125rem;
-        border-radius: 0.25rem;
-    }
-
-    .supply-card .item-name {
-        font-size: 1rem;
-        line-height: 130%;
-        white-space: normal;
-    }
-
-    .supply-card .item-traits {
-        font-size: 0.75rem;
-        letter-spacing: -0.02rem;
-    }
-
-    .supply-card .item-traits ul {
-        list-style-type: none;
-    }
-
-    .supply-card .item-traits ul li {
-        display: inline;
-    }
-
-    .supply-card .item-traits ul li:not(:last-child):after {
-        content: ' · ';
-    }
-
-    .supply-card .v-card-text {
-        padding: 0;
-    }
-
-    .supply-card .bonuses {
-        padding: 0.5rem 0 0 0;
-    }
-
-    .supply-card .dlc {
-        padding-top: 0.75rem; 
-    }
-</style>

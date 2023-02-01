@@ -1,11 +1,15 @@
 <script>
     import { BONUSES_MAPPING } from '../constants';
-    import ColumnsBlock from './ColumnsBlock.vue';
+    import AnnoCard from './basic/AnnoCard.vue';
+    import Bage from './basic/Bage.vue';
+    import ColumnsBlock from './basic/ColumnsBlock.vue';
     
     export default {
         name: "ItemCard",
         props: [ "item" ],
         components: {
+            AnnoCard,
+            Bage,
             ColumnsBlock,
         },
         computed: {
@@ -24,118 +28,49 @@
 
 <template>
     <v-lazy :options="{ threshold: .5 }" transition="fade-transition">
-        <v-card class="item-card fill-height" variant="outlined">
-            <v-card-item class="card-header">
-                <template v-slot:prepend>
-                    <div :class="[`item-bage item-rarity-` + item.rarity_order]">
-                        <v-img
-                            aspect-ratio="1"
-                            height="3.125rem"
-                            width="3.125rem"
-                            :src="item.image_url"
-                        />
-                    </div>
-                </template>
-                <v-card-title class="item-name font-weight-bold align-self-stretch">
-                    {{ item.name }}
-                </v-card-title>
-                <v-card-subtitle class="item-traits font-italic">
-                    <ul>
-                        <li v-for="trait in item.traits">{{ trait }}</li>
-                    </ul>
-                </v-card-subtitle>
-            </v-card-item>
+        <AnnoCard>
+            <div class="header underlined-bottom">
+                <Bage
+                    :class="[`item-rarity-${item.rarity_order}`]"
+                    :image_src="item.image_src"
+                    height="3.125rem"
+                    width="3.125rem"
+                />
+                <div>
+                    <p class="regular-text font-weight-bold">{{ item.name }}</p>
+                    <template v-if="item.traits.length > 0">
+                        <ul class="traits smallest-text flat-list font-italic">
+                            <li v-for="trait in item.traits">{{ trait }}</li>
+                        </ul>
+                    </template>
+                </div>
+            </div>
             
-            <v-card-text>
-                <ColumnsBlock :columnsConfig="BonusesColumnsConfig" />            
-                <template v-if="item.dlc">
-                    <div class="dlc font-italic font-weight-bold text-end">{{ item.dlc }} DLC</div>
-                </template>
-            </v-card-text>
-        </v-card>
+            <ColumnsBlock :columnsConfig="BonusesColumnsConfig" />            
+            <template v-if="item.dlc.length > 0">
+                <div class="dlc secondary-text-color smallest-text font-italic text-end">
+                    <ul>
+                        <li class="font-weight-bold" v-for="dlc in item.dlc">{{ dlc }} DLC</li>
+                    </ul>
+                </div>
+            </template>
+        </AnnoCard>
     </v-lazy>
   </template>
 
 
 <style scoped>
-    .item-card {
-        padding: 0.625rem;
-    }
-
-    .card-header {
-        padding: 0 0 0.5rem 0;
-        border-bottom: 1px solid #E4DAC8;
-    }
-
-    .item-bage {
-        padding: 0.3125rem;
-        border-radius: 0.25rem;
-        border-width: 2px;
-        border-style: solid;
-    }
-
-    .item-bage.item-rarity-0 {
-        border-color: #968878;
-        background-color: #F6F3EF;
-    }
-
-    .item-bage.item-rarity-1 {
-        border-color: #8BA679;
-        background-color: #E6F0DF;
-    }
-
-    .item-bage.item-rarity-2 {
-        border-color: #729AC6;
-        background-color: #CEE2EC;
-    }
-
-    .item-bage.item-rarity-3 {
-        border-color: #AB81BF;
-        background-color: #DFCFE7;
-    }
-
-    .item-bage.item-rarity-4 {
-        border-color: #D8AC35;
-        background-color: #FCECC2;
-    }
-
-    .item-bage.item-rarity--1 {
-        border-color: #E4DAC8;
-        background-color: #FFFEFB;
-    }
-
-    .item-card .item-name {
-        font-size: 1rem;
-        line-height: 130%;
-        white-space: normal;
-    }
-
-    .item-card .item-traits {
-        font-size: 0.75rem;
+    .traits {
+        padding-top: 0.25rem;
         letter-spacing: -0.02rem;
     }
 
-    .item-card .item-traits ul {
-        list-style-type: none;
-    }
-
-    .item-card .item-traits ul li {
-        display: inline;
-    }
-
-    .item-card .item-traits ul li:not(:last-child):after {
+    .traits li:not(:last-child):after {
         content: ' · ';
     }
 
-    .item-card .v-card-text {
-        padding: 0;
-    }
-
-    .item-card .bonuses {
-        padding: 0.5rem 0 0 0;
-    }
-
-    .item-card .dlc {
-        padding-top: 0.75rem; 
+    .dlc {
+        margin-top: auto;
+        padding-top: 0.5rem;
     }
 </style>

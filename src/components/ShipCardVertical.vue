@@ -1,0 +1,76 @@
+<script>
+    import { BONUSES_MAPPING } from '../constants';
+    import AnnoCard from './basic/AnnoCard.vue';
+    import Bage from './basic/Bage.vue';
+    import ColumnsBlock from './basic/ColumnsBlock.vue';
+    
+    export default {
+        name: "ShipCardVertical",
+        props: [ "item" ],
+        components: {
+            AnnoCard,
+            Bage,
+            ColumnsBlock,
+        },
+        computed: {
+            SlotsColumnsConfig() {
+                const values = [ this.item.cargo_slots, this.item.item_slots ].concat(
+                    Object.values(this.item.bonuses));
+                let labels = [ "Cargo Slots", "Item Slots" ];
+                Object.keys(this.item.bonuses).forEach((bonus) => { labels.push(BONUSES_MAPPING[bonus]); });
+                return {
+                    labels: labels,
+                    values: values,
+                    columns: 1
+                }
+            }
+        }
+    }
+</script>
+
+<template>
+    <v-lazy :options="{ threshold: .5 }" transition="fade-transition">
+        <AnnoCard class="ship-card-vertical">
+            <Bage
+                :image_src="item.image_src"
+                height="5.625rem"
+                width="5.625rem"
+            />
+            <ColumnsBlock :columnsConfig="SlotsColumnsConfig" />
+            <div class="ship-types">
+                <ul>
+                    <li v-for="ship_type in item.types">{{ ship_type }}</li>
+                </ul>
+            </div>
+        </AnnoCard>
+    </v-lazy>
+</template>
+
+<style scoped>
+    .ship-card-vertical {
+        width: 8rem;
+        padding: 0.375rem 0.25rem;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+    }
+
+    .ship-card-vertical .bonuses {
+        padding: 0;
+        font-size: 0.875rem;
+    }
+
+    .ship-card-vertical .bonuses > :nth-child(2n) {
+        border-bottom: 1px solid #E4DAC8;
+        padding-bottom: 0.5rem;
+    }
+
+    .ship-card-vertical .ship-types {
+        width: 100%;
+        font-size: 0.875rem;
+        color: #968878;
+    }
+
+    .ship-card-vertical .ship-types ul {
+        list-style-type: none;
+    }
+</style>

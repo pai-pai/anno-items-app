@@ -21,5 +21,5 @@ export default createVuetify({
         sets: {
           md,
         }
-    },
+    }
 })

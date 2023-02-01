@@ -1,10 +1,12 @@
 <script>
     import lodash from "lodash";
-    import ColumnRow from "./ColumnRow.vue"
+    import ColumnRow from "./ColumnRow.vue";
 
     export default {
         name: "Bonuses",
-        props: [ "columnsConfig" ],
+        props: {
+            columnsConfig: Object,
+        },
         components: {
             ColumnRow
         },
@@ -27,17 +29,23 @@
 </script>
 
 <template>
-    <v-container class="bonuses">
+    <v-container :class="[`bonuses small-text columns-${configuration.cols} pa-0`]">
         <template v-if="configuration.titles">
-            <v-row no-gutters class="justify-space-between font-italic">
-                <v-col class="columns-block-column-1" cols="6">{{ configuration.titles[0] }}</v-col>
-                <v-col class="columns-block-column-2" cols="6">{{ configuration.titles[1] }}</v-col>
+            <v-row no-gutters class="secondary-text-color justify-space-between font-italic">
+                <v-col
+                    v-for="c in configuration.cols"
+                    :class="[`columns-block-column-` + c]"
+                    :cols="12/configuration.cols"
+                >
+                    {{ configuration.titles[c-1] }}
+                </v-col>
             </v-row>
         </template>
         <v-row no-gutters class="justify-space-between" v-for="r in configuration.rows">
             <ColumnRow
                 v-for="c in configuration.cols"
                 :class="[`columns-block-column-` + c]"
+                :cols="12/configuration.cols"
                 :label="configuration.labels[c-1][r-1]"
                 :value="configuration.values[c-1][r-1]"
             />
@@ -46,11 +54,11 @@
 </template>
 
 <style scoped>
-    .columns-block-column-1 {
-        padding-right: 0.8rem !important;
+    .bonuses.columns-2 .columns-block-column-1 {
+        padding-right: 1.25rem;
     }
 
-    .columns-block-column-2 {
-        padding-left: 0.8rem !important;
+    .bonuses.columns-2 .columns-block-column-2 {
+        padding-left: 1.25rem;
     }
 </style>
