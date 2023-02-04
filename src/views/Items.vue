@@ -1,93 +1,102 @@
 <script>
-    import lodash from "lodash";
-    import axios from "axios";
+    import { defineComponent, onBeforeMount } from "vue";
+    import { storeToRefs } from "pinia";
+    import { useItemsStore } from "../stores/items";
     import ItemCard from "../components/ItemCard.vue";
 
-    export default {
+    export default defineComponent({
         data: () => ({
             sortByOptions: [
-                { title: "Name: A-Z", value: "name" },
-                { title: "Name: Z-A", value: "-name" },
-                { title: "Rarity: Common to legendary", value: "rarity_order" },
-                { title: "Rarity: Legendary to common", value: "-rarity_order" },
+                { title: "Name: A-Z", value: { field: ["name"], order: ["asc"] } },
+                { title: "Name: Z-A", value: { field: ["name"], order: ["desc"] } },
+                { title: "Rarity: Common to legendary", value: { field: ["rarity_order", "name"], order: ["asc", "asc"] } },
+                { title: "Rarity: Legendary to common", value: { field: ["rarity_order", "name"], order: ["desc", "asc"] } },
             ],
-            rarityOptions: [
-                { title: "Common", value: "common" },
-                { title: "Uncommon", value: "uncommon" },
-                { title: "Rare", value: "rare" },
-                { title: "Epic", value: "epic" },
-                { title: "Legendary", value: "legendary" },
-                { title: "Character item", value: "character item" },
-            ],
-            dlcOptions: [ "Land of Lions", "The Anarchist" ],
-            traitsOptions: [ "Diver", "Entertainer", "Pirate" ],
-            items: [],
             itemsPerRow: 4
         }),
         components: {
             ItemCard
         },
-        computed: {
-            ItemsChunksWithId() {
-                const arr = lodash.chunk(Object.values(this.items), this.itemsPerRow);
-                return arr.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
+        setup() {
+            const itemsStore = useItemsStore();
+            const {
+                items,
+                filters,
+                orderBy,
+                rarity,
+                dlc,
+                trait,
+            } = storeToRefs(itemsStore);
+
+            onBeforeMount(async () => {
+                await itemsStore.fetchItems();
+            });
+
+            return {
+                items,
+                itemsByChunks: itemsStore.chunkedList,
+                filters,
+                orderBy,
+                rarity,
+                dlc,
+                trait,
             }
-        },
-        methods: {
-            async getItems() {
-                const { data } = await axios.get("http://127.0.0.1:5000/api/items");
-                this.items = data;
-            }
-        },
-        beforeMount() {
-            this.getItems();
-        },
-    }
+        }
+    })
 </script>
 
 <template>
-    <v-container class="control-panel pa-0 pt-3 pb-5">
-        <v-row justify="start">
-            <v-col cols="3">
-                <v-select
-                    :items="sortByOptions"
-                    variant="underlined"
-                    density="compact"
-                    label="Sort by"
-                    item-value="value" />
-            </v-col>
-            <v-col cols="3">
-                <v-select
-                    :items="rarityOptions"
-                    variant="underlined"
-                    density="compact"
-                    label="Rarity"
-                    item-value="value" />
-            </v-col>
-            <v-col cols="3">
-                <v-select
-                    :items="dlcOptions"
-                    variant="underlined"
-                    density="compact"
-                    label="DLC" />
-            </v-col>
-            <v-col cols="3">
-                <v-select
-                    :items="traitsOptions"
-                    variant="underlined"
-                    density="compact"
-                    label="Traits" />
-            </v-col>
-        </v-row>
-    </v-container>
-
-    <v-container class="content items pa-0">
-        <template v-if="items.length === 0">
-            <v-progress-circular indeterminate :size="50" />
-        </template>
-        <template v-else>
+    <template v-if="items.length === 0">
+        <v-progress-circular indeterminate :size="50" />
+    </template>
+    <template v-else>
+        <v-container class="pa-0">
+            <v-row justify="start" class="control-panel mt-5 mb-3">
+                <v-col cols="3">
+                    <v-select
+                        :items="sortByOptions"
+                        clearable
+                        clear-icon="close"
+                        variant="underlined"
+                        density="compact"
+                        label="Sort by"
+                        item-value="value"
+                        v-model="orderBy" />
+                </v-col>
+                <v-col cols="3">
+                    <v-select
+                        :items="filters.rarity"
+                        clearable
+                        clear-icon="close"
+                        variant="underlined"
+                        density="compact"
+                        label="Rarity"
+                        v-model="rarity" />
+                </v-col>
+                <v-col cols="3">
+                    <v-select
+                        :items="filters.dlc"
+                        clearable
+                        clear-icon="close"
+                        variant="underlined"
+                        density="compact"
+                        label="DLC"
+                        v-model="dlc" />
+                </v-col>
+                <v-col cols="3">
+                    <v-select
+                        :items="filters.traits"
+                        clearable
+                        clear-icon="close"
+                        variant="underlined"
+                        density="compact"
+                        label="Traits"
+                        v-model="trait" />
+                </v-col>
+            </v-row>
+        
             <DynamicScroller
-                :items="ItemsChunksWithId"
+                :items="itemsByChunks(itemsPerRow)"
                 keyField="id"
                 :min-item-size="54"
                 class="scroller"
@@ -106,11 +115,15 @@
                     </DynamicScrollerItem>
                 </template>
             </DynamicScroller>
-        </template>
-    </v-container>
+        </v-container>
+    </template>
 </template>
 
 <style scoped>
+    .control-panel .v-col {
+        align-self: flex-end;
+    }
+
     .scroller {
         height: 100%;
     }

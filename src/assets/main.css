@@ -76,3 +76,20 @@ ul.flat-list li {
 .control-panel .bonuses [class*=columns-block-column-] {
     padding-right: 4rem !important;
 }
+
+.control-panel .v-col .v-field__clearable,
+.control-panel .v-col .v-field__append-inner {
+    align-items: center;
+}
+
+.control-panel .v-col .v-field__clearable > .v-icon {
+    font-size: 1rem;
+}
+
+.control-panel .v-col .v-field--variant-underlined .v-field__outline::after {
+    border: none;
+}
+
+header.v-app-bar.v-toolbar:not(.v-toolbar--flat) {
+    box-shadow: 0px 4px 8px rgba(87, 77, 68, 0.2);
+}
