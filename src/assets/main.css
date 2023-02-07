@@ -77,17 +77,36 @@ ul.flat-list li {
     padding-right: 4rem !important;
 }
 
+.control-panel .v-col .v-field--variant-underlined .v-field__outline::after {
+    border: none;
+}
+
 .control-panel .v-col .v-field__clearable,
-.control-panel .v-col .v-field__append-inner {
+.filters-panel .v-col .v-field__clearable,
+.control-panel .v-col .v-field__append-inner,
+.filters-panel .v-col .v-field__append-inner {
     align-items: center;
 }
 
-.control-panel .v-col .v-field__clearable > .v-icon {
+.control-panel .v-col .v-field__clearable > .v-icon,
+.filters-panel .v-col .v-field__clearable > .v-icon {
     font-size: 1rem;
 }
 
-.control-panel .v-col .v-field--variant-underlined .v-field__outline::after {
-    border: none;
+.control-panel label.v-label.v-field-label,
+.filters-panel label.v-label.v-field-label {
+    line-height: 1rem;
+    top: 1.25rem;
+}
+
+.control-panel label.v-label.v-field-label.v-field-label--floating,
+.filters-panel label.v-label.v-field-label.v-field-label--floating {
+    top: 0.65rem;
+}
+
+.control-panel .v-input__control .v-field,
+.filters-panel .v-input__control .v-field {
+    --v-input-control-height: 2.5rem;
 }
 
 header.v-app-bar.v-toolbar:not(.v-toolbar--flat) {
