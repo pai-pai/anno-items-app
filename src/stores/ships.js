@@ -5,7 +5,7 @@ import { APIURL } from "../constants";
 
 export const useShipsStore = defineStore("ships", {
     state: () => ({
-        ships: [],
+        items: [],
         filters: {},
         orderBy: null,
         shipType: null,
@@ -16,7 +16,7 @@ export const useShipsStore = defineStore("ships", {
         },
         chunkedList(state) {
             return (itemsPerRow) => {
-                let itemsList = lodash.cloneDeep(state.ships);
+                let itemsList = lodash.cloneDeep(state.items);
                 if (state.shipType) {
                     itemsList = lodash.filter(itemsList, function(o) {
                         return o.types.includes(state.shipType);
@@ -40,7 +40,7 @@ export const useShipsStore = defineStore("ships", {
         async fetchItems() {
             try {
                 const { data } = await axios.get(`${APIURL}/api/ships`);
-                this.ships = data.objects;
+                this.items = data.objects;
                 this.filters = data._filters;
             } catch (error) {
                 alert(error);

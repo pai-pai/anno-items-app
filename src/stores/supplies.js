@@ -3,19 +3,18 @@ import lodash from "lodash";
 import { defineStore } from "pinia";
 import { APIURL } from "../constants";
 
-export const useItemsStore = defineStore("items", {
+export const useSuppliesStore = defineStore("supplies", {
     state: () => ({
         items: [],
         filters: {},
         orderBy: null,
-        rarity: null,
-        dlc: null,
-        trait: null,
+        isRation: null,
+        bonus: null,
         searchPhrase: null
     }),
     getters: {
         isFiltered(state) {
-            return state.orderBy || state.rarity || state.dlc || state.trait || state.searchPhrase;
+            return state.orderBy || state.isRation || state.bonus || state.searchPhrase;
         },
         chunkedList(state) {
             return (itemsPerRow) => {
@@ -26,17 +25,12 @@ export const useItemsStore = defineStore("items", {
                         return o.name.toLowerCase().includes(phrase);
                     });
                 }
-                if (state.rarity) {
-                    itemsList = lodash.filter(itemsList, { "rarity": state.rarity.toLowerCase() });
+                if (state.isRation !== null) {
+                    itemsList = lodash.filter(itemsList, { "extra_rations": state.isRation });
                 }
-                if (state.dlc) {
+                if (state.bonus) {
                     itemsList = lodash.filter(itemsList, function(o) {
-                        return o.dlc.includes(state.dlc);
-                    });
-                }
-                if (state.trait) {
-                    itemsList = lodash.filter(itemsList, function(o) {
-                        return o.traits.includes(state.trait);
+                        return o.bonuses[state.bonus] > 0;
                     });
                 }
                 if (state.orderBy) {
@@ -51,15 +45,14 @@ export const useItemsStore = defineStore("items", {
         clearFilters() {
             this.$patch({
                 orderBy: null,
-                rarity: null,
-                dlc: null,
-                trait: null,
+                isRation: null,
+                bonus: null,
                 searchPhrase: null
             })
         },
         async fetchItems() {
             try {
-                const { data } = await axios.get(`${APIURL}/api/items`);
+                const { data } = await axios.get(`${APIURL}/api/supplies`);
                 this.items = data.objects;
                 this.filters = data._filters;
             } catch (error) {

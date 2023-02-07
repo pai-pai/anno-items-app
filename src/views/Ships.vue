@@ -13,7 +13,7 @@
                 { title: "Number of slots: Low to high", value: { field: ["total_slots", "name"], order: ["asc", "asc"] } },
                 { title: "Number of slots: High to low", value: { field: ["total_slots", "name"], order: ["desc", "asc"] } },
             ],
-            ships: [],
+            items: [],
             itemsPerRow: 4
         }),
         components: {
@@ -23,7 +23,7 @@
         setup() {
             const shipsStore = useShipsStore();
             const {
-                ships,
+                items,
                 filters,
                 orderBy,
                 shipType,
@@ -31,13 +31,13 @@
             
 
             onBeforeMount(async () => {
-                if (shipsStore.ships.length === 0) {
+                if (shipsStore.items.length === 0) {
                     await shipsStore.fetchItems();
                 }
             });
 
             return {
-                ships,
+                items,
                 itemsByChunks: shipsStore.chunkedList,
                 filters,
                 orderBy,
@@ -50,7 +50,7 @@
 </script>
 
 <template>
-    <v-progress-circular v-if="ships.length === 0" indeterminate :size="50" />
+    <v-progress-circular v-if="items.length === 0" indeterminate :size="50" />
 
     <v-container v-else class="px-0">
         <v-row justify="start" class="control-panel mt-5">
