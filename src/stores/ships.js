@@ -28,6 +28,9 @@ export const useShipsStore = defineStore("ships", {
                 const chunked = lodash.chunk(Object.values(itemsList), itemsPerRow);
                 return chunked.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
             }
+        },
+        activeShip(state) {
+            return state.items.find(item => item.active);
         }
     },
     actions: {
@@ -36,6 +39,16 @@ export const useShipsStore = defineStore("ships", {
                 orderBy: null,
                 shipType: null,
             })
+        },
+        activateShip(ship) {
+            if (ship === this.activeShip) {
+                ship.active = false;
+                return;
+            }
+            if (this.activeShip) {
+                this.activeShip.active = false;
+            }
+            ship.active = true;
         },
         async fetchItems() {
             try {

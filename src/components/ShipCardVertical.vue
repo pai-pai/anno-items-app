@@ -30,7 +30,7 @@
 
 <template>
     <v-lazy :options="{ threshold: .5 }" transition="fade-transition">
-        <AnnoCard class="ship-card-vertical">
+        <AnnoCard :class="[`ship-card-vertical ${ item.active ? 'active' : '' }`]">
             <Bage
                 :image_src="item.image_src"
                 height="5.625rem"
@@ -48,10 +48,15 @@
 
 <style scoped>
     .ship-card-vertical {
-        width: 8rem;
-        padding: 0.375rem 0.25rem;
+        width: 8.25rem;
+        padding: 0.375rem;
         gap: 0.25rem;
         font-size: 0.75rem;
+    }
+
+    .ship-card-vertical.active {
+        padding: calc(0.375rem - 1px);
+        border: 2px solid #968878;
     }
 
     .ship-card-vertical .bonuses {

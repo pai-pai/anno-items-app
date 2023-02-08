@@ -13,10 +13,10 @@
 </script>
 
 <template>
-    <Popper placement="right" offsetDistance="3" hover>
+    <Popper v-bind="$attrs" placement="right" offsetDistance="3">
         <Bage :class="class" :image_src="image_src" :width="width" :height="height" />
-        <template #content>
-            <slot></slot>
+        <template #content="props">
+            <slot name="content" v-bind="props" />
         </template>
     </Popper>
 </template>

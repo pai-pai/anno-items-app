@@ -1,7 +1,7 @@
 <script> 
     export default {
         name: "Bage",
-        props: [ "image_src", "class", "width", "height" ]
+        props: [ "image_src", "class", "width", "height", "clearable" ]
     }
 </script>
 
@@ -12,7 +12,11 @@
             :height="height"
             :width="width"
             :src="image_src"
+            draggable="false"
         />
+        <div class="remove-btn">
+            <v-icon icon="md:close" />
+        </div>
     </div>
 </template>
 
@@ -55,5 +59,16 @@
     .item-bage.item-rarity--1 {
         border-color: #E4DAC8;
         background-color: #FFFEFB;
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: -0.5rem;
+        right: -0.1rem;
+        width: auto;
+    }
+
+    .remove-btn i {
+        font-size: 1rem;
     }
 </style>

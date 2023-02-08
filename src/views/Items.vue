@@ -135,7 +135,7 @@
         </Transition>
 
         <DynamicScroller
-            :items="itemsByChunks(itemsPerRow)"
+            :items="itemsByChunks(itemsPerRow, true)"
             keyField="id"
             :min-item-size="54"
             class="scroller"

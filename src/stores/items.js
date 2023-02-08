@@ -18,33 +18,36 @@ export const useItemsStore = defineStore("items", {
             return state.orderBy || state.rarity || state.dlc || state.trait || state.searchPhrase;
         },
         chunkedList(state) {
-            return (itemsPerRow) => {
+            return (itemsPerRow, filtered) => {
                 let itemsList = lodash.cloneDeep(state.items);
-                if (state.searchPhrase && state.searchPhrase.trim()) {
-                    const phrase = state.searchPhrase.trim().toLowerCase();
-                    itemsList = lodash.filter(itemsList, function(o) {
-                        return o.name.toLowerCase().includes(phrase);
-                    });
-                }
-                if (state.rarity) {
-                    itemsList = lodash.filter(itemsList, { "rarity": state.rarity.toLowerCase() });
-                }
-                if (state.dlc) {
-                    itemsList = lodash.filter(itemsList, function(o) {
-                        return o.dlc.includes(state.dlc);
-                    });
-                }
-                if (state.trait) {
-                    itemsList = lodash.filter(itemsList, function(o) {
-                        return o.traits.includes(state.trait);
-                    });
-                }
-                if (state.orderBy) {
-                    itemsList = lodash.orderBy(itemsList, state.orderBy.field, state.orderBy.order);
+                if (filtered) {
+                    if (state.searchPhrase && state.searchPhrase.trim()) {
+                        const phrase = state.searchPhrase.trim().toLowerCase();
+                        itemsList = lodash.filter(itemsList, function(o) {
+                            return o.name.toLowerCase().includes(phrase);
+                        });
+                    }
+                    if (state.rarity) {
+                        itemsList = itemsList.filter(item => item.rarity === state.rarity.toLowerCase());
+                    }
+                    if (state.dlc) {
+                        itemsList = itemsList.filter(item => item.dlc.includes(state.dlc));
+                    }
+                    if (state.trait) {
+                        itemsList = itemsList.filter(item => item.traits.includes(state.trait));
+                    }
+                    if (state.orderBy) {
+                        itemsList = lodash.orderBy(itemsList, state.orderBy.field, state.orderBy.order);
+                    }
                 }
                 const chunked = lodash.chunk(Object.values(itemsList), itemsPerRow);
                 return chunked.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
-            };   
+            }
+        },
+        itemById(state) {
+            return (itemId) => {
+                return this.items.find((item) => item._id == itemId);
+            }
         }
     },
     actions: {
