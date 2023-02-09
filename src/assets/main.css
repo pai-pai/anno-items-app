@@ -73,7 +73,7 @@ ul.flat-list li {
     background-color: #FFFEFB;
 }
 
-.control-panel .bonuses [class*=columns-block-column-] {
+.stats-panel .bonuses [class*=columns-block-column-] {
     padding-right: 4rem !important;
 }
 

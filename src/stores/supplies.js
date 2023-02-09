@@ -39,6 +39,11 @@ export const useSuppliesStore = defineStore("supplies", {
                 const chunked = lodash.chunk(Object.values(itemsList), itemsPerRow);
                 return chunked.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
             };   
+        },
+        itemById(state) {
+            return (itemId) => {
+                return state.items.find((item) => item._id == itemId);
+            }
         }
     },
     actions: {

@@ -40,7 +40,7 @@
             const { items } = storeToRefs(itemsStore);
             const ships = storeToRefs(shipsStore).items;
             const supplies = storeToRefs(suppliesStore).items;
-            const { ship, traits } = storeToRefs(expeditionStore);
+            const { ship, rationBonus, moraleBonus, traits } = storeToRefs(expeditionStore);
 
             onBeforeMount(async () => {
                 if (itemsStore.items.length === 0) {
@@ -61,12 +61,16 @@
                 supplies,
                 ship,
                 expeditionBonuses: computed(() => expeditionStore.expeditionBonuses),
+                rationBonus,
+                moraleBonus,
                 traits,
                 pickShip: (ship) => expeditionStore.pickShip(ship),
                 removeItem: (item) => expeditionStore.removeItem(item),
+                reset: () => expeditionStore.reset(),
                 pickedItems: computed(() => expeditionStore.pickedItems),
                 expeditionStore,
                 itemsStore,
+                suppliesStore,
             }
         },
         computed: {
@@ -80,20 +84,22 @@
             AdditionalBonusesConfig() {
                 return {
                     labels: [ "Ration", "Morale", "Traits" ],
-                    values: [ "No", 0, this.traits.join(", ") ],
+                    values: [ this.rationBonus ? "Yes": "No", this.moraleBonus, this.traits.join(", ") ],
                     columns: 2
                 }
             }
         },
         methods: {
-            startDrag(evt, item, itemType) {
+            dragItem(evt, item, itemType) {
                 evt.dataTransfer.dropEffect = "move";
                 evt.dataTransfer.effectAllowed = "move";
                 evt.dataTransfer.setData("itemId", item._id);
                 evt.dataTransfer.setData("itemType", itemType);
             },
-            onDrop(evt) {
-                const dropedItem = this.itemsStore.itemById(evt.dataTransfer.getData("itemId"));
+            dropItem(evt) {
+                const itemType = evt.dataTransfer.getData("itemType");
+                const store = itemType == "item" ? this.itemsStore : this.suppliesStore;
+                const dropedItem = store.itemById(evt.dataTransfer.getData("itemId"));
                 if (dropedItem) {
                     this.expeditionStore.pickItem(dropedItem);
                 }
@@ -103,8 +109,8 @@
 </script>
 
 <template>
-    <v-container class="fluid mt-3 mb-5">
-        <v-row justify="start" class="control-panel font-italic">
+    <v-container class="fluid mb-5 pt-0">
+        <v-row justify="start" class="stats-panel font-italic pt-8 pb-2">
             <v-col cols="4" class="pa-0">
                 <ColumnsBlock :columnsConfig="bonusesColumnsConfig" />
             </v-col>
@@ -113,18 +119,17 @@
             </v-col>
             <v-spacer />
             <v-col cols="1" class="pa-0 text-right">
-                <v-icon icon="md:refresh"></v-icon>
+                <v-icon icon="md:refresh" @click="reset()"></v-icon>
             </v-col>
         </v-row>
 
-        <v-row justify="start" class="text-h6 secondary-text-color pt-8 pb-3">Pick a ship</v-row>
+        <v-row justify="start" class="text-h6 secondary-text-color pt-8 pb-1">Pick a ship</v-row>
         <v-row justify="start" class="ships-picker">
             <div class="ships-picker-container">
                 <Splide :options="{ rewind: true, gap: '0.625rem', autoWidth: true, arrows: false, pagination: false }">
                     <SplideSlide v-for="ship in ships">
                         <ShipCardVertical
                             :item="ship"
-                            :class="[`${pickedItems.length > 0 ? 'locked': ''}`]"
                             @click="pickShip(ship)" />
                     </SplideSlide>
                 </Splide>
@@ -132,11 +137,11 @@
         </v-row>
 
         <template v-if="ship">
-            <v-row justify="start" class="text-h6 secondary-text-color pt-8 pb-3">Add items & supplies</v-row>
+            <v-row justify="start" class="text-h6 secondary-text-color pt-8 pb-1">Add items & supplies</v-row>
             <v-row justify="start" class="goods-picker-drop-zone-container">
                 <div
                     class="goods-picker-drop-zone mb-3"
-                    @drop="onDrop($event)"
+                    @drop="dropItem($event)"
                     @dragover.prevent
                     @dragenter.prevent
                 >
@@ -173,7 +178,7 @@
                                             height="4.375rem"
                                             width="4.375rem"
                                             draggable="true"
-                                            @dragstart="startDrag($event, it, 'items')"
+                                            @dragstart="dragItem($event, it, 'item')"
                                         >
                                             <template #content>
                                                 <ItemTooltip :item="it" />
@@ -195,6 +200,8 @@
                             :image_src="supply.image_src"
                             height="4.375rem"
                             width="4.375rem"
+                            draggable="true"
+                            @dragstart="dragItem($event, supply, 'supply')"
                         >
                             <template #content>
                                 <SupplyTooltip :item="supply" />
@@ -208,7 +215,11 @@
 </template>
 
 <style scoped>
-    .control-panel .bonuses {
+    .stats-panel {
+        border-bottom: 1px solid #E4DAC8;
+    }
+
+    .stats-panel .bonuses {
         padding: 0;
         font-size: 1rem;
     }

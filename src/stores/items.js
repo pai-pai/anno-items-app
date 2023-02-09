@@ -46,7 +46,7 @@ export const useItemsStore = defineStore("items", {
         },
         itemById(state) {
             return (itemId) => {
-                return this.items.find((item) => item._id == itemId);
+                return state.items.find((item) => item._id == itemId);
             }
         }
     },
