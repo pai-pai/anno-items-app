@@ -1,7 +1,7 @@
 <script>
     import { BONUSES_MAPPING } from '../constants';
     import AnnoCard from './basic/AnnoCard.vue';
-    import Bage from './basic/Bage.vue';
+    import Badge from './basic/Badge.vue';
     import ColumnsBlock from './basic/ColumnsBlock.vue';
     
     export default {
@@ -9,7 +9,7 @@
         props: [ "item" ],
         components: {
             AnnoCard,
-            Bage,
+            Badge,
             ColumnsBlock,
         },
         computed: {
@@ -35,7 +35,7 @@
     <v-lazy :options="{ threshold: .5 }" transition="fade-transition">
         <AnnoCard>
             <div class="header underlined-bottom">
-                <Bage
+                <Badge
                     :image_src="item.image_src"
                     height="3.125rem"
                     width="3.125rem"

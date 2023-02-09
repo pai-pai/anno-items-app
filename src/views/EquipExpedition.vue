@@ -8,8 +8,8 @@
 
     import { Splide, SplideSlide } from '@splidejs/vue-splide';
     import { BONUSES_MAPPING } from "../constants";
-    import Bage from "../components/basic/Bage.vue";
-    import BageWithTooltip from "../components/basic/BageWithTooltip.vue";
+    import Badge from "../components/basic/Badge.vue";
+    import BadgeWithTooltip from "../components/basic/BadgeWithTooltip.vue";
     import ColumnsBlock from "../components/basic/ColumnsBlock.vue";
     import ItemTooltip from "../components/ItemTooltip.vue";
     import ShipCardVertical from "../components/ShipCardVertical.vue";
@@ -22,8 +22,8 @@
             supplies: []
         }),
         components: {
-            Bage,
-            BageWithTooltip,
+            Badge,
+            BadgeWithTooltip,
             ColumnsBlock,
             ItemTooltip,
             ShipCardVertical,
@@ -140,7 +140,7 @@
                     @dragover.prevent
                     @dragenter.prevent
                 >
-                <Bage
+                <Badge
                     v-for="item in pickedItems"
                     :class="[`item-rarity-${item.rarity_order}`]"
                     :image_src="item.image_src"
@@ -167,7 +167,7 @@
                                 >
                                 <div class="items-row">
                                     <div class="item-in-row" v-for="it in item.rowData" >
-                                        <BageWithTooltip
+                                        <BadgeWithTooltip
                                             :class="[`item-rarity-${it.rarity_order}`]"
                                             :image_src="it.image_src"
                                             height="4.375rem"
@@ -178,7 +178,7 @@
                                             <template #content>
                                                 <ItemTooltip :item="it" />
                                             </template>
-                                        </BageWithTooltip>
+                                        </BadgeWithTooltip>
                                     </div>
                                 </div>
                                 </DynamicScrollerItem>
@@ -189,7 +189,7 @@
                 <div></div>
                 <div class="supplies-container">
                     <div class="supplies-drag-zone">
-                        <BageWithTooltip
+                        <BadgeWithTooltip
                             v-for="supply in supplies"
                             class="item-rarity--1"
                             :image_src="supply.image_src"
@@ -199,7 +199,7 @@
                             <template #content>
                                 <SupplyTooltip :item="supply" />
                             </template>
-                        </BageWithTooltip>
+                        </BadgeWithTooltip>
                     </div>
                 </div>
             </v-row>

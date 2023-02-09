@@ -1,6 +1,6 @@
 <script> 
     export default {
-        name: "Bage",
+        name: "Badge",
         props: {
             class: String,
             image_src: String,
