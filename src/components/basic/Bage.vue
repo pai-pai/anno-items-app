@@ -1,7 +1,22 @@
 <script> 
     export default {
         name: "Bage",
-        props: [ "image_src", "class", "width", "height", "clearable" ]
+        props: {
+            class: String,
+            image_src: String,
+            width: {
+                type: String,
+                default: "4.375rem"
+            },
+            height: {
+                type: String,
+                default: "4.375rem"
+            },
+            clearable: {
+                type: Boolean,
+                default: false,
+            }
+        }
     }
 </script>
 
@@ -14,8 +29,8 @@
             :src="image_src"
             draggable="false"
         />
-        <div class="remove-btn">
-            <v-icon icon="md:close" />
+        <div class="remove-btn" v-if="clearable">
+            <v-icon icon="md:cancel" @click="$emit('remove')" />
         </div>
     </div>
 </template>
@@ -63,12 +78,12 @@
 
     .remove-btn {
         position: absolute;
-        top: -0.5rem;
-        right: -0.1rem;
+        top: -0.3rem;
+        right: 0rem;
         width: auto;
     }
 
     .remove-btn i {
-        font-size: 1rem;
+        font-size: 1.2rem;
     }
 </style>

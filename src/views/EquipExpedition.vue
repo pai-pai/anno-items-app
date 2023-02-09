@@ -63,6 +63,7 @@
                 expeditionBonuses: computed(() => expeditionStore.expeditionBonuses),
                 traits,
                 pickShip: (ship) => expeditionStore.pickShip(ship),
+                removeItem: (item) => expeditionStore.removeItem(item),
                 pickedItems: computed(() => expeditionStore.pickedItems),
                 expeditionStore,
                 itemsStore,
@@ -96,7 +97,7 @@
                 if (dropedItem) {
                     this.expeditionStore.pickItem(dropedItem);
                 }
-            },
+            }
         }
     })
 </script>
@@ -144,7 +145,9 @@
                     :class="[`item-rarity-${item.rarity_order}`]"
                     :image_src="item.image_src"
                     height="4.375rem"
-                    width="4.375rem" />
+                    width="4.375rem"
+                    clearable
+                    @remove="removeItem(item)" />
                 </div>
             </v-row>
             <v-row class="goods-picker-drag-zone-container">
@@ -223,7 +226,7 @@
         flex-wrap: wrap;
         gap: 0.25rem;
         width: 100%;
-        min-height: 5.375rem;
+        min-height: 6.35rem;
         background: rgba(228, 218, 200, 0.32);
         border: 1px solid #E4DAC8;
         border-radius: 0.25rem;
