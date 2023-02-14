@@ -23,9 +23,7 @@ export const useItemsStore = defineStore("items", {
                 if (filtered) {
                     if (state.searchPhrase && state.searchPhrase.trim()) {
                         const phrase = state.searchPhrase.trim().toLowerCase();
-                        itemsList = lodash.filter(itemsList, function(o) {
-                            return o.name.toLowerCase().includes(phrase);
-                        });
+                        itemsList.filter(item => item.name.toLowerCase().includes(phrase));
                     }
                     if (state.rarity) {
                         itemsList = itemsList.filter(item => item.rarity === state.rarity.toLowerCase());

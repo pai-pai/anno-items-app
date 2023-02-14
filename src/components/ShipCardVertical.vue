@@ -30,7 +30,7 @@
 
 <template>
     <v-lazy :options="{ threshold: .5 }" transition="fade-transition">
-        <AnnoCard :class="[`ship-card-vertical ${ item.active ? 'active' : '' }`]">
+        <AnnoCard class="ship-card-vertical">
             <Badge
                 :image_src="item.image_src"
                 height="5.625rem"
@@ -54,9 +54,21 @@
         font-size: 0.75rem;
     }
 
-    .ship-card-vertical.active {
+    .active .ship-card-vertical {
         padding: calc(0.375rem - 1px);
         border: 2px solid #968878;
+    }
+
+    .locked .ship-card-vertical::before {
+        font-family: "Material Icons";
+        content: '\e897';
+        font-size: 1.75rem;
+        color: rgba(87, 77, 68, 0.75);
+        line-height: 1.75rem;
+        position: absolute;
+        left: 0;
+        top: 0.15rem;
+        z-index: 1;
     }
 
     .ship-card-vertical .bonuses {

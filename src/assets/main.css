@@ -73,8 +73,26 @@ ul.flat-list li {
     background-color: #FFFEFB;
 }
 
-.stats-panel .bonuses [class*=columns-block-column-] {
-    padding-right: 4rem !important;
+.stats-panel .bonuses .value {
+    font-weight: bold;
+}
+
+.stats-panel .bonuses-section .bonuses .v-col-10 {
+    flex: 0 0 78%;
+    max-width: 78%;
+}
+
+.stats-panel .bonuses-section .bonuses .v-col-2 {
+    flex: 0 0 22%;
+    max-width: 22%;
+}
+
+.stats-panel .bonuses-section .bonuses .columns-block-column-1 {
+    padding-right: 2rem !important;
+}
+
+.stats-panel .bonuses-section .bonuses .columns-block-column-2 {
+    padding-left: 2rem !important;
 }
 
 .control-panel .v-col .v-field--variant-underlined .v-field__outline::after {
@@ -119,4 +137,8 @@ img {
     -moz-user-drag: none;
     -o-user-drag: none;
     user-drag: none;
+}
+
+.vue-recycle-scroller__item-view:hover {
+    z-index: 999;
 }

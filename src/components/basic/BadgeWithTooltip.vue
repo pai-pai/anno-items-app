@@ -13,7 +13,12 @@
 </script>
 
 <template>
-    <Popper v-bind="$attrs" placement="right" offsetDistance="3">
+    <Popper
+        v-bind="$attrs"
+        placement="right"
+        offsetDistance="3"
+        hover
+    >
         <Badge :class="class" :image_src="image_src" :width="width" :height="height" />
         <template #content="props">
             <slot name="content" v-bind="props" />

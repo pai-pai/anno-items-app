@@ -40,7 +40,7 @@
             const { items } = storeToRefs(itemsStore);
             const ships = storeToRefs(shipsStore).items;
             const supplies = storeToRefs(suppliesStore).items;
-            const { ship, rationBonus, moraleBonus, traits } = storeToRefs(expeditionStore);
+            const { ship, pickedItems, rationBonus, moraleBonus, traits } = storeToRefs(expeditionStore);
 
             onBeforeMount(async () => {
                 if (itemsStore.items.length === 0) {
@@ -59,15 +59,15 @@
                 itemsByChunks: itemsStore.chunkedList,
                 ships,
                 supplies,
-                ship,
                 expeditionBonuses: computed(() => expeditionStore.expeditionBonuses),
                 rationBonus,
                 moraleBonus,
                 traits,
                 pickShip: (ship) => expeditionStore.pickShip(ship),
-                removeItem: (item) => expeditionStore.removeItem(item),
+                removeItem: (item, index) => expeditionStore.removeItem(item, index),
                 reset: () => expeditionStore.reset(),
-                pickedItems: computed(() => expeditionStore.pickedItems),
+                pickedShip: ship,
+                pickedItems,
                 expeditionStore,
                 itemsStore,
                 suppliesStore,
@@ -83,14 +83,17 @@
             },
             AdditionalBonusesConfig() {
                 return {
-                    labels: [ "Ration", "Morale", "Traits" ],
-                    values: [ this.rationBonus ? "Yes": "No", this.moraleBonus, this.traits.join(", ") ],
-                    columns: 2
+                    labels: [ "Ration", "Morale" ],
+                    values: [ this.rationBonus ? "Yes": "No", this.moraleBonus ],
+                    columns: 1
                 }
             }
         },
         methods: {
             dragItem(evt, item, itemType) {
+                if (this.pickedShip.total_slots === this.pickedItems.length) {
+                    return;
+                }
                 evt.dataTransfer.dropEffect = "move";
                 evt.dataTransfer.effectAllowed = "move";
                 evt.dataTransfer.setData("itemId", item._id);
@@ -103,6 +106,16 @@
                 if (dropedItem) {
                     this.expeditionStore.pickItem(dropedItem);
                 }
+            },
+            isShipActive(ship) {
+                return this.pickedShip && this.pickedShip._id === ship._id;
+            },
+            isShipLocked(ship) {
+                return this.isShipActive(ship) && this.pickedItems.length > 0;
+            },
+            isShipItem(item) {
+                if (!this.pickedShip || !item.equipped_in) return;
+                return this.pickedShip.equipped_in.includes(item.equipped_in);
             }
         }
     })
@@ -110,35 +123,39 @@
 
 <template>
     <v-container class="fluid mb-5 pt-0">
-        <v-row justify="start" class="stats-panel font-italic pt-8 pb-2">
-            <v-col cols="4" class="pa-0">
+        <div class="stats-panel font-italic">
+            <div class="bonuses-section">
                 <ColumnsBlock :columnsConfig="bonusesColumnsConfig" />
-            </v-col>
-            <v-col cols="4" class="pa-0">
+            </div>
+            <div class="ration-morale-section">
                 <ColumnsBlock :columnsConfig="AdditionalBonusesConfig" />
-            </v-col>
-            <v-spacer />
-            <v-col cols="1" class="pa-0 text-right">
+            </div>
+            <div class="traits-section">
+                <div class="label">Traits</div>
+                <div class="value font-weight-bold">{{ traits.join(", ") || "-" }}</div>
+            </div>
+            <div class="text-right">
                 <v-icon icon="md:refresh" @click="reset()"></v-icon>
-            </v-col>
-        </v-row>
+            </div>
+        </div>
 
-        <v-row justify="start" class="text-h6 secondary-text-color pt-8 pb-1">Pick a ship</v-row>
         <v-row justify="start" class="ships-picker">
+            <div class="text-h6 secondary-text-color pt-8 pb-1">Pick a ship</div>
             <div class="ships-picker-container">
                 <Splide :options="{ rewind: true, gap: '0.625rem', autoWidth: true, arrows: false, pagination: false }">
-                    <SplideSlide v-for="ship in ships">
+                    <SplideSlide v-for="sh in ships">
                         <ShipCardVertical
-                            :item="ship"
-                            @click="pickShip(ship)" />
+                            :item="sh"
+                            :class="[`${ isShipActive(sh) ? 'active' : '' } ${ isShipLocked(sh) ? 'locked': '' }`]"
+                            @click="pickShip(sh)" />
                     </SplideSlide>
                 </Splide>
             </div>
         </v-row>
 
-        <template v-if="ship">
-            <v-row justify="start" class="text-h6 secondary-text-color pt-8 pb-1">Add items & supplies</v-row>
+        <template v-if="pickedShip">
             <v-row justify="start" class="goods-picker-drop-zone-container">
+                <div class="text-h6 secondary-text-color pt-8 pb-1">Add items & supplies</div>
                 <div
                     class="goods-picker-drop-zone mb-3"
                     @drop="dropItem($event)"
@@ -146,49 +163,51 @@
                     @dragenter.prevent
                 >
                 <Badge
-                    v-for="item in pickedItems"
-                    :class="[`item-rarity-${item.rarity_order}`]"
+                    v-for="(item, index) in pickedItems"
+                    :class="[`item-rarity-${item.rarity_order} ${ isShipItem(item) ? 'ship-item' : '' }`]"
                     :image_src="item.image_src"
                     height="4.375rem"
                     width="4.375rem"
                     clearable
-                    @remove="removeItem(item)" />
+                    @remove="removeItem(item, index)" />
                 </div>
             </v-row>
             <v-row class="goods-picker-drag-zone-container">
-                <div class="items-container">
-                    <div class="items-drag-zone">
-                        <DynamicScroller
-                            :items="itemsByChunks(7, false)"
-                            keyField="id"
-                            :min-item-size="54"
-                            class="scroller"
-                        >
-                            <template v-slot="{ item, index, active }">
-                                <DynamicScrollerItem
-                                    :item="item"
-                                    :active="active"
-                                    :data-index="index"
-                                >
-                                <div class="items-row">
-                                    <div class="item-in-row" v-for="it in item.rowData" >
-                                        <BadgeWithTooltip
-                                            :class="[`item-rarity-${it.rarity_order}`]"
-                                            :image_src="it.image_src"
-                                            height="4.375rem"
-                                            width="4.375rem"
-                                            draggable="true"
-                                            @dragstart="dragItem($event, it, 'item')"
-                                        >
-                                            <template #content>
-                                                <ItemTooltip :item="it" />
-                                            </template>
-                                        </BadgeWithTooltip>
+                <div>
+                    <div class="items-container">
+                        <div class="items-drag-zone">
+                            <DynamicScroller
+                                :items="itemsByChunks(7, false)"
+                                keyField="id"
+                                :min-item-size="54"
+                                class="scroller"
+                            >
+                                <template v-slot="{ item, index, active }">
+                                    <DynamicScrollerItem
+                                        :item="item"
+                                        :active="active"
+                                        :data-index="index"
+                                    >
+                                    <div class="items-row">
+                                        <div class="item-in-row" v-for="it in item.rowData" >
+                                            <BadgeWithTooltip
+                                                :class="[`item-rarity-${it.rarity_order} ${ isShipItem(it) ? 'ship-item' : '' }`]"
+                                                :image_src="it.image_src"
+                                                height="4.375rem"
+                                                width="4.375rem"
+                                                :draggable="pickedItems.length < pickedShip.total_slots"
+                                                @dragstart="dragItem($event, it, 'item')"
+                                            >
+                                                <template #content>
+                                                    <ItemTooltip :item="it" />
+                                                </template>
+                                            </BadgeWithTooltip>
+                                        </div>
                                     </div>
-                                </div>
-                                </DynamicScrollerItem>
-                            </template>
-                        </DynamicScroller>
+                                    </DynamicScrollerItem>
+                                </template>
+                            </DynamicScroller>
+                        </div>
                     </div>
                 </div>
                 <div></div>
@@ -200,7 +219,7 @@
                             :image_src="supply.image_src"
                             height="4.375rem"
                             width="4.375rem"
-                            draggable="true"
+                            :draggable="pickedItems.length < pickedShip.total_slots"
                             @dragstart="dragItem($event, supply, 'supply')"
                         >
                             <template #content>
@@ -216,12 +235,37 @@
 
 <style scoped>
     .stats-panel {
+        display: grid;
+        grid-template-columns: 3fr 1.25fr 3fr 1.75fr;
         border-bottom: 1px solid #E4DAC8;
+        background: #FFFEFB;
+        position: fixed;
+        max-width: 1200px;
+        width: 100%;
+        z-index: 1003;
+        margin: 0 -1rem;
+        margin-top: 0.75rem;
+        padding: 1rem 0;
     }
 
     .stats-panel .bonuses {
         padding: 0;
         font-size: 1rem;
+    }
+
+    .bonuses-section,
+    .ration-morale-section {
+        padding-right: 5rem;
+    }
+
+    .traits-section {
+        display: flex;
+        gap: 2rem;
+        font-size: 1rem;
+    }
+
+    .ships-picker {
+        padding-top: 9rem;
     }
 
     .ships-picker-container {
@@ -274,6 +318,12 @@
 
     .scroller {
         height: 480px;
+        -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer, Edge */
+        scrollbar-width: none; /* Hide scrollbar for Firefox */
+    }
+
+    .scroller::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
     }
 
     .items-row {

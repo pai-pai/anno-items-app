@@ -76,11 +76,28 @@
         background-color: #FFFEFB;
     }
 
+    .item-bage.ship-item::before {
+        font-family: "anno-icons";
+        content: '\e908';
+        font-size: 1.2rem;
+        color: rgba(87, 77, 68, 0.75);
+        line-height: 1.2rem;
+        position: absolute;
+        left: 0.15rem;
+        top: 0.15rem;
+        z-index: 1;
+    }
+
     .remove-btn {
         position: absolute;
-        top: -0.3rem;
+        top: -0.2rem;
         right: 0rem;
         width: auto;
+        color: rgba(87, 77, 68, 0.25)
+    }
+
+    .remove-btn:hover {
+        color: rgba(87, 77, 68, 0.75)
     }
 
     .remove-btn i {

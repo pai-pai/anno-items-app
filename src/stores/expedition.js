@@ -6,19 +6,13 @@ import { useSuppliesStore } from "../stores/supplies";
 
 export const useExpeditionStore = defineStore("expedition", {
     state: () => ({
-        ship: undefined,
+        ship: null,
+        pickedItems: [],
         rationBonus: false,
         moraleBonus: 0,
         traits: [],
     }),
     getters: {
-        pickedItems(state) {
-            const itemsStore = useItemsStore();
-            const suppliesStore = useSuppliesStore();
-            const items = itemsStore.items.filter(item => item.picked);
-            const supplies = suppliesStore.items.filter(item => item.picked);
-            return items.concat(supplies);
-        },
         expeditionBonuses(state) {
             const bonuses = {
                 crafting: 0,
@@ -55,28 +49,34 @@ export const useExpeditionStore = defineStore("expedition", {
             }
             return bonuses;
         },
+        pickedShipItems(state) {
+            if (!state.ship) return;
+            if (state.pickedItems.length === 0) return [];
+            return state.pickedItems.filter(item => {
+                return item.equipped_in && state.ship.equipped_in.includes(item.equipped_in);
+            });
+        }
     },
     actions: {
         pickShip(ship) {
-            if (this.pickedItems.length > 0) {
+            if (this.pickedItems.length > 0) return;
+            if (this.ship && this.ship._id == ship._id) {
+                this.ship = null;
                 return;
             }
-            const shipsStore = useShipsStore();
-            shipsStore.activateShip(ship);
-            this.ship = shipsStore.activeShip;
+            this.ship = ship;
         },
         pickItem(item) {
-            item.picked = true;
+            if (this.pickedItems.length === this.ship.total_slots) return;
+            const isNotShipItem = !this.ship.equipped_in.includes(item.equipped_in);
+            const notShipItemsCount = this.pickedItems.length - this.pickedShipItems.length;
+            if (isNotShipItem && notShipItemsCount === this.ship.cargo_slots) return;
+            this.pickedItems.push(item);
         },
-        removeItem(item) {
-            item.picked = false;
+        removeItem(item, index) {
+            this.pickedItems.splice(index, 1);
         },
         reset() {
-            if (this.ship) {
-                this.ship.active = false;
-            }
-            const pickedItems = this.pickedItems;
-            pickedItems.forEach((item) => item.picked = false);
             this.$reset();
         }
     },
