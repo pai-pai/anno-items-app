@@ -11,6 +11,11 @@ export const useExpeditionStore = defineStore("expedition", {
         rationBonus: false,
         moraleBonus: 0,
         traits: [],
+        searchItem: null,
+        itemsBonusesFilter: [],
+        searchSupply: null,
+        suppliesBonusesFilter: [],
+        suppliesRationFilter: false,
     }),
     getters: {
         expeditionBonuses(state) {
@@ -55,7 +60,47 @@ export const useExpeditionStore = defineStore("expedition", {
             return state.pickedItems.filter(item => {
                 return item.equipped_in && state.ship.equipped_in.includes(item.equipped_in);
             });
-        }
+        },
+        getItems(state) {
+            const itemsStore = useItemsStore();
+            return (itemsPerRow) => {
+                let itemsList = lodash.cloneDeep(itemsStore.items);
+                if (state.searchItem && state.searchItem.trim()) {
+                    const phrase = state.searchItem.trim().toLowerCase();
+                    itemsList = itemsList.filter(item => item.name.toLowerCase().includes(phrase));
+                }
+                if (state.itemsBonusesFilter.length > 0) {
+                    itemsList = itemsList.filter((item) => state.itemsBonusesFilter.some(
+                        (bonus) => item.bonuses[bonus] > 0
+                    ));
+                }
+                const chunked = lodash.chunk(Object.values(itemsList), itemsPerRow);
+                return chunked.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
+            }
+        },
+        getSupplies(state) {
+            const suppliesStore = useSuppliesStore();
+            let itemsList = lodash.cloneDeep(suppliesStore.items);
+            if (state.suppliesRationFilter) {
+                itemsList = itemsList.filter(item => item.extra_rations);
+            }
+            if (state.searchSupply && state.searchSupply.trim()) {
+                const phrase = state.searchSupply.trim().toLowerCase();
+                itemsList = itemsList.filter(item => item.name.toLowerCase().includes(phrase));
+            }
+            if (state.suppliesBonusesFilter.length > 0) {
+                itemsList = itemsList.filter((item) => state.suppliesBonusesFilter.some(
+                    (bonus) => item.bonuses[bonus] > 0
+                ));
+            }
+            return itemsList;
+        },
+        itemsFiltered(state) {
+            return state.searchItem || state.itemsBonusesFilter.length > 0;
+        },
+        suppliesFiltered(state) {
+            return state.searchSupply || state.suppliesBonusesFilter.length > 0 || state.suppliesRationFilter;
+        },
     },
     actions: {
         pickShip(ship) {
@@ -78,6 +123,19 @@ export const useExpeditionStore = defineStore("expedition", {
         },
         reset() {
             this.$reset();
-        }
+        },
+        clearFilters(itemType) {
+            let filters = itemType === "item" ?
+                { searchItem: null, itemsBonusesFilter: [] } :
+                { searchSupply: null, suppliesBonusesFilter: [], suppliesRationFilter: false };
+            this.$patch(filters);
+        },
+        clearSuppliesFilters() {
+            this.$patch({
+                searchSupply: null,
+                suppliesBonusesFilter: [],
+                suppliesRationFilter: false,
+            })
+        },
     },
 });

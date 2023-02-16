@@ -101,30 +101,47 @@ ul.flat-list li {
 
 .control-panel .v-col .v-field__clearable,
 .filters-panel .v-col .v-field__clearable,
+.goods-picker-drag-zone-container .v-field__clearable,
 .control-panel .v-col .v-field__append-inner,
-.filters-panel .v-col .v-field__append-inner {
+.filters-panel .v-col .v-field__append-inner,
+.goods-picker-drag-zone-container .v-field__append-inner {
     align-items: center;
 }
 
 .control-panel .v-col .v-field__clearable > .v-icon,
-.filters-panel .v-col .v-field__clearable > .v-icon {
+.filters-panel .v-col .v-field__clearable > .v-icon,
+.goods-picker-drag-zone-container .v-field__clearable > .v-icon {
     font-size: 1rem;
 }
 
 .control-panel label.v-label.v-field-label,
-.filters-panel label.v-label.v-field-label {
+.filters-panel label.v-label.v-field-label,
+.goods-picker-drag-zone-container label.v-label.v-field-label {
     line-height: 1rem;
     top: 1.25rem;
 }
 
 .control-panel label.v-label.v-field-label.v-field-label--floating,
-.filters-panel label.v-label.v-field-label.v-field-label--floating {
+.filters-panel label.v-label.v-field-label.v-field-label--floating,
+.goods-picker-drag-zone-container label.v-label.v-field-label.v-field-label--floating {
     top: 0.65rem;
 }
 
 .control-panel .v-input__control .v-field,
 .filters-panel .v-input__control .v-field {
     --v-input-control-height: 2.5rem;
+}
+
+.goods-picker-drag-zone-container .filters-btn .v-btn__append {
+    margin-left: 0;
+}
+
+.goods-picker-drag-zone-container .v-checkbox .v-selection-control {
+    min-height: 1.25rem;
+}
+
+.goods-picker-drag-zone-container .v-selection-control .v-label {
+    height: 1.25rem;
 }
 
 header.v-app-bar.v-toolbar:not(.v-toolbar--flat) {
@@ -141,4 +158,8 @@ img {
 
 .vue-recycle-scroller__item-view:hover {
     z-index: 999;
+}
+
+.vue-recycle-scroller__item-wrapper:hover {
+    overflow: visible;
 }

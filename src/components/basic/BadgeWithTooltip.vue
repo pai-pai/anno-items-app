@@ -4,7 +4,7 @@
     
     export default {
         name: "BageWithTooltip",
-        props: [ "image_src", "class", "width", "height" ],
+        props: [ "image_src", "class", "width", "height", "clearable" ],
         components: {
             Badge,
             Popper,
@@ -19,7 +19,7 @@
         offsetDistance="3"
         hover
     >
-        <Badge :class="class" :image_src="image_src" :width="width" :height="height" />
+        <Badge :class="class" :image_src="image_src" :width="width" :height="height" :clearable="clearable" />
         <template #content="props">
             <slot name="content" v-bind="props" />
         </template>

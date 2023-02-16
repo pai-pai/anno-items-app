@@ -61,7 +61,7 @@
 
     .locked .ship-card-vertical::before {
         font-family: "Material Icons";
-        content: '\e897';
+        content: "\e897";
         font-size: 1.75rem;
         color: rgba(87, 77, 68, 0.75);
         line-height: 1.75rem;
