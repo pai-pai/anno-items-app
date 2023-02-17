@@ -1,7 +1,6 @@
 import lodash from "lodash";
 import { defineStore } from "pinia";
 import { useItemsStore } from "../stores/items";
-import { useShipsStore } from "../stores/ships";
 import { useSuppliesStore } from "../stores/supplies";
 
 export const useExpeditionStore = defineStore("expedition", {
@@ -70,7 +69,7 @@ export const useExpeditionStore = defineStore("expedition", {
                     itemsList = itemsList.filter(item => item.name.toLowerCase().includes(phrase));
                 }
                 if (state.itemsBonusesFilter.length > 0) {
-                    itemsList = itemsList.filter((item) => state.itemsBonusesFilter.some(
+                    itemsList = itemsList.filter((item) => state.itemsBonusesFilter.every(
                         (bonus) => item.bonuses[bonus] > 0
                     ));
                 }
@@ -89,7 +88,7 @@ export const useExpeditionStore = defineStore("expedition", {
                 itemsList = itemsList.filter(item => item.name.toLowerCase().includes(phrase));
             }
             if (state.suppliesBonusesFilter.length > 0) {
-                itemsList = itemsList.filter((item) => state.suppliesBonusesFilter.some(
+                itemsList = itemsList.filter((item) => state.suppliesBonusesFilter.every(
                     (bonus) => item.bonuses[bonus] > 0
                 ));
             }

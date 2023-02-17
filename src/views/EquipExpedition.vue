@@ -35,15 +35,45 @@
             SupplyTooltip,
         },
         watch: {
-            showSuppliesFilters: {
+            showItemsFilters: {
                 handler() {
-                    this.resizeSupplies();
+                    this.resizePickerContainer("items");
                 },
                 flush: "post"
             },
-            suppliesFiltered: {
+            itemsBonusesFilter: {
                 handler() {
-                    this.resizeSupplies();
+                    this.resizePickerContainer("items");
+                },
+                flush: "post"
+            },
+            searchItem: {
+                handler() {
+                    this.resizePickerContainer("items");
+                },
+                flush: "post"
+            },
+            showSuppliesFilters: {
+                handler() {
+                    this.resizePickerContainer("supplies");
+                },
+                flush: "post"
+            },
+            suppliesBonusesFilter: {
+                handler() {
+                    this.resizePickerContainer("supplies");
+                },
+                flush: "post"
+            },
+            suppliesRationFilter: {
+                handler() {
+                    this.resizePickerContainer("supplies");
+                },
+                flush: "post"
+            },
+            searchSupply: {
+                handler() {
+                    this.resizePickerContainer("supplies");
                 },
                 flush: "post"
             },
@@ -166,21 +196,18 @@
             toggleFiltersSupplies() {
                 this.showSuppliesFilters = !this.showSuppliesFilters;
             },
-            resizeSupplies() {
-                const container = document.querySelector(".supplies-container");
-                const containerMaxHeight = parseInt(getComputedStyle(container).maxHeight);
-                const scroller = document.querySelector(".supplies-drag-zone");
-                const filters = document.querySelector(".filters-panel");
-                const filtersHeight = filters ? filters.offsetHeight : 0;
-                const blockHeight = container.offsetHeight + filtersHeight;
+            resizePickerContainer(itemsType) {
+                const sectionHeight = document.querySelector(".goods-picker-drag-zone-container").offsetHeight;
+                const controlPanelHeight = document.querySelector(`.${itemsType}-control-panel`).offsetHeight;
+                const container = document.querySelector(`.${itemsType}-container`);
+                const scroller = document.querySelector(`.${itemsType}-drag-zone`);
+                const innerScroller = document.querySelector(`.${itemsType}-drag-zone .scroller`);
+                const containerScrollerDiff = container.offsetHeight - scroller.offsetHeight;
+                const blockHeight = sectionHeight - controlPanelHeight;
 
-                if (blockHeight > containerMaxHeight) {
-                    container.style.height = container.offsetHeight - filtersHeight + "px";
-                    scroller.style.height = scroller.offsetHeight - filtersHeight + "px";
-                } else {
-                    container.style.removeProperty("height");
-                    scroller.style.removeProperty("height");
-                }
+                container.style.maxHeight = blockHeight + "px";
+                scroller.style.maxHeight = blockHeight - containerScrollerDiff + "px";
+                if (innerScroller) { innerScroller.style.maxHeight = scroller.style.maxHeight; }
             }
         }
     })
@@ -241,8 +268,8 @@
             </v-row>
             <v-row class="goods-picker-drag-zone-container">
                 <div>
-                    <div class="controls">
-                        <div class="items-control-panel">
+                    <div class="items-control-panel">
+                        <div class="controls">
                             <v-text-field
                                 clearable
                                 clear-icon="close"
@@ -292,8 +319,12 @@
                         </div>
                     </div>
                     <div class="items-container">
-                        <div class="items-drag-zone">
+                        <div :class="[`items-drag-zone ${getItems(itemsPerRow).length === 0 ? 'd-flex' : ''}`]">
+                            <div v-if="getItems(itemsPerRow).length === 0" class="no-data-placeholder pa-3 w-100 text-subtitle-1 text-center">
+                                No items found
+                            </div>
                             <DynamicScroller
+                                v-else
                                 :items="getItems(itemsPerRow)"
                                 keyField="id"
                                 :min-item-size="54"
@@ -388,7 +419,11 @@
                     </div>
                     <div class="supplies-container">
                         <div class="supplies-drag-zone">
+                            <div v-if="getSupplies.length === 0" class="no-data-placeholder pa-3 w-100 text-subtitle-1 text-center">
+                                No supplies found
+                            </div>
                             <BadgeWithTooltip
+                                v-else
                                 v-for="supply in getSupplies"
                                 class="item-rarity--1"
                                 :image_src="supply.image_src"
@@ -401,9 +436,6 @@
                                     <SupplyTooltip :item="supply" />
                                 </template>
                             </BadgeWithTooltip>
-                            <div v-if="getSupplies.length === 0" class="pa-3 w-100 text-subtitle-1 text-center">
-                                No supplies found
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -487,6 +519,7 @@
         display: grid;
         grid-template-columns: 7fr 1fr 5fr;
         justify-items: stretch;
+        height: 35rem;
     }
 
     .goods-picker-drag-zone-container > div {
@@ -505,7 +538,7 @@
         max-width: 11.25rem;
     }
 
-    .supplies-control-panel .controls  {
+    .controls  {
         display: flex;
         justify-content: space-between;
         width: 100%;
@@ -524,12 +557,13 @@
         padding: 0 0.5rem;
     }
 
-    .supplies-control-panel .filters-panel {
+    .filters-panel {
         display: grid;
-        grid-template-columns: 3fr 2fr;
         padding-bottom: 1rem;
+        grid-template-columns: 3fr 2fr;
     }
-    .supplies-control-panel .filters-panel .bonuses-filter {
+
+    .filters-panel .bonuses-filter {
         display: grid;
         grid-template-columns: 1fr 1fr;
     }
@@ -539,7 +573,7 @@
         border: 1px solid #E4DAC8;
         border-radius: 0.25rem;
         padding: 0.5rem;
-        max-height: 31.25rem;
+        max-height: 31.125rem;
     }
 
     .supplies-drag-zone {
@@ -548,11 +582,21 @@
         overflow-y: scroll;
     }
 
+    .items-drag-zone,
     .supplies-drag-zone,
     .scroller {
         max-height: 30rem;
+        min-height: 11rem;
+    }
+
+    .supplies-drag-zone,
+    .scroller {
         -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer, Edge */
         scrollbar-width: none; /* Hide scrollbar for Firefox */
+    }
+
+    .scroller {
+        height: 100%;
     }
 
     .items-drag-zone::-webkit-scrollbar,
@@ -572,6 +616,10 @@
     .supplies-drag-zone {
         column-gap: 0.3rem;
         row-gap: 0.25rem;
+    }
+
+    .no-data-placeholder {
+        margin: auto;
     }
 
     @media only screen 
