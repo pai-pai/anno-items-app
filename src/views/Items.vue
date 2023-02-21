@@ -1,5 +1,6 @@
 <script>
     import { computed, defineComponent, onBeforeMount } from "vue";
+    import { useDisplay } from "vuetify";
     import { storeToRefs } from "pinia";
     import { useItemsStore } from "../stores/items";
     import ClearableSelectInput from "../components/basic/ClearableSelectInput.vue";
@@ -13,7 +14,6 @@
                 { title: "Rarity: Common to legendary", value: { field: ["rarity_order", "name"], order: ["asc", "asc"] } },
                 { title: "Rarity: Legendary to common", value: { field: ["rarity_order", "name"], order: ["desc", "asc"] } },
             ],
-            itemsPerRow: 4,
             showFilters: false,
         }),
         components: {
@@ -36,7 +36,17 @@
                 trait,
                 searchPhrase,
             } = storeToRefs(itemsStore);
-            
+            const { name } = useDisplay();
+            const itemsPerRow = computed(() => {
+                switch (name.value) {
+                    case "xs": return 2
+                    case "sm": return 3
+                    case "md": return 3
+                    case "lg": return 4
+                    case "xl": return 6
+                    case "xxl": return 6
+                }
+            });
 
             onBeforeMount(async () => {
                 if (itemsStore.items.length === 0) {
@@ -46,7 +56,8 @@
 
             return {
                 items,
-                itemsByChunks: itemsStore.chunkedList,
+                itemsPerRow,
+                itemsByChunks: computed((itemsPerRow) => itemsStore.chunkedList),
                 filters,
                 orderBy,
                 rarity,
@@ -63,7 +74,7 @@
 <template>
     <v-progress-circular v-if="items.length === 0" indeterminate :size="50" />
 
-    <v-container v-else class="px-0">
+    <v-container v-else>
         <v-row justify="start" class="control-panel mt-5">
             <v-col cols="3" class="px-3 py-0">
                 <v-text-field
@@ -135,7 +146,7 @@
         </Transition>
 
         <DynamicScroller
-            :items="itemsByChunks(itemsPerRow, true)"
+            :items="itemsByChunks(itemsPerRow)"
             keyField="id"
             :min-item-size="54"
             class="scroller"
@@ -214,5 +225,38 @@
     .slidedown-leave-to {
         overflow: hidden;
         max-height: 0.25rem;
+    }
+
+    @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 480px)
+        and (-webkit-min-device-pixel-ratio: 2) {
+        .items-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media only screen 
+        and (min-device-width: 768px) 
+        and (max-device-width: 1024px) 
+        and (orientation: portrait) {
+        .items-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media only screen 
+        and (min-device-width: 768px) 
+        and (max-device-width: 1024px) 
+        and (orientation: landscape) {
+        .items-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media screen and (min-width: 1904px) {
+        .items-row {
+            grid-template-columns: repeat(6, 1fr);
+        }
     }
 </style>

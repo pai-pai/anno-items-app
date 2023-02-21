@@ -55,10 +55,10 @@
 
 <style scoped>
     .bonuses.columns-2 .columns-block-column-1 {
-        padding-right: 1.25rem;
+        padding-right: 1rem;
     }
 
     .bonuses.columns-2 .columns-block-column-2 {
-        padding-left: 1.25rem;
+        padding-left: 1rem;
     }
 </style>

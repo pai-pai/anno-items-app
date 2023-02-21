@@ -197,6 +197,7 @@
                 this.showSuppliesFilters = !this.showSuppliesFilters;
             },
             resizePickerContainer(itemsType) {
+                if (!document.querySelector(".goods-picker-drag-zone-container")) { return; }
                 const sectionHeight = document.querySelector(".goods-picker-drag-zone-container").offsetHeight;
                 const controlPanelHeight = document.querySelector(`.${itemsType}-control-panel`).offsetHeight;
                 const container = document.querySelector(`.${itemsType}-container`);
@@ -214,7 +215,7 @@
 </script>
 
 <template>
-    <v-container class="fluid mb-5 pt-0">
+    <v-container class="mb-5 pt-0">
         <div class="stats-panel font-italic">
             <div class="bonuses-section">
                 <ColumnsBlock :columnsConfig="bonusesColumnsConfig" />
@@ -226,9 +227,10 @@
                 <div class="label">Traits</div>
                 <div class="value font-weight-bold">{{ traits.join(", ") || "-" }}</div>
             </div>
-            <div class="text-right">
+            <div :class="[`text-right reset-expedition ${ pickedShip ? '': 'disabled' }`]">
                 <v-icon icon="md:refresh" @click="reset()"></v-icon>
             </div>
+            <div class="divider"></div>
         </div>
 
         <v-row justify="start" class="ships-picker">
@@ -247,7 +249,7 @@
 
         <template v-if="pickedShip">
             <v-row justify="start" class="goods-picker-drop-zone-container">
-                <div class="text-h6 secondary-text-color pt-8 pb-1">Add items & supplies</div>
+                <div class="text-h6 secondary-text-color pt-8 pb-1">Add specialists, items and supplies</div>
                 <div
                     class="goods-picker-drop-zone mb-3"
                     @drop="dropItem($event)"
@@ -256,7 +258,7 @@
                 >
                     <Badge
                         v-for="(item, index) in pickedItems"
-                        :class="[`item-rarity-${item.rarity_order} ${ isShipItem(item) ? 'ship-item' : '' }`]"
+                        :class="[`item-rarity-${item.rarity_order === undefined ? '-1': item.rarity_order } ${ isShipItem(item) ? 'ship-item' : '' }`]"
                         :image_src="item.image_src"
                         height="4.375rem"
                         width="4.375rem"
@@ -448,15 +450,15 @@
     .stats-panel {
         display: grid;
         grid-template-columns: 3fr 1.25fr 3fr 1.75fr;
-        border-bottom: 1px solid #E4DAC8;
         background: #FFFEFB;
         position: fixed;
         max-width: 1200px;
         width: 100%;
         z-index: 1003;
-        margin: 0 -1rem;
         margin-top: 0.75rem;
-        padding: 1rem 0;
+        padding: 1rem 1rem 0 1rem;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .stats-panel .bonuses {
@@ -475,8 +477,30 @@
         font-size: 1rem;
     }
 
+    .reset-expedition.disabled i,
+    .reset-expedition i {
+        color: rgba(87, 77, 68, 0.25)
+    }
+
+    .reset-expedition:not(.disabled) i:hover {
+        color: rgba(87, 77, 68, 0.75)
+    }
+
+    .reset-expedition.disabled i {
+        cursor: default;
+    }
+
+    .stats-panel .divider {
+        width: 100%;
+        border-bottom: 1px solid #E4DAC8;
+        grid-column-start: 1;
+        grid-column-end: 5;
+        padding-bottom: 1rem;
+    }
+
     .ships-picker {
         padding-top: 9rem;
+        padding: 9rem 1rem 0 1rem;
     }
 
     .ships-picker-container {
@@ -485,6 +509,10 @@
 
     .ships-picker-container .v-lazy {
         height: 100%;
+    }
+
+    .goods-picker-drop-zone-container {
+        padding: 0 1rem;
     }
 
     .goods-picker-drop-zone {
@@ -517,9 +545,10 @@
 
     .goods-picker-drag-zone-container {
         display: grid;
-        grid-template-columns: 7fr 1fr 5fr;
+        grid-template-columns: 7.1fr 0.7fr 5.1fr;
         justify-items: stretch;
         height: 35rem;
+        padding: 0 1rem;
     }
 
     .goods-picker-drag-zone-container > div {
@@ -631,7 +660,11 @@
         }
 
         .goods-picker-drag-zone-container {
-            grid-template-columns: 7fr 1fr 5.65fr;
+            grid-template-columns: 7fr 0.5fr 5.65fr;
+        }
+
+        .supplies-control-panel .filters-panel {
+            grid-template-columns: 5fr 2fr;
         }
     }
 
@@ -648,7 +681,13 @@
         }
 
         .goods-picker-drag-zone-container {
-            grid-template-columns: 8fr 0.3fr 4.9fr;
+            grid-template-columns: 6.2fr 1.3fr 4.7fr;
+        }
+
+        .supplies-control-panel .filters-panel {
+            display: flex;
+            flex-direction: column;
+            row-gap: 1rem;
         }
     }
 
@@ -662,7 +701,7 @@
         }
 
         .goods-picker-drag-zone-container {
-            grid-template-columns: 9.5fr 1.5fr 7.5fr;
+            grid-template-columns: 9.5fr 1.4fr 7.65fr;
         }
     }
 </style>

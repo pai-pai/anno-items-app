@@ -54,7 +54,7 @@
 
             return {
                 items,
-                itemsByChunks: suppliesStore.chunkedList,
+                getItems: computed(() => suppliesStore.getItems),
                 filters,
                 orderBy,
                 isRation,
@@ -70,7 +70,7 @@
 <template>
     <v-progress-circular v-if="items.length === 0" indeterminate :size="50" />
 
-    <v-container v-else class="px-0">
+    <v-container v-else>
         <v-row justify="start" class="control-panel mt-5">
             <v-col cols="3" class="px-3 py-0">
                 <v-select
@@ -106,15 +106,17 @@
             </v-col>
         </v-row>
 
-        <v-row justify="start" v-for="itemsForRow in itemsByChunks(itemsPerRow)">
-            <v-col cols="3" class="pa-2" align-self="stretch" v-for="item in itemsForRow.rowData">
-                <SupplyCard :item="item" class="fill-height" />
-            </v-col>
-        </v-row>
+        <div class="supplies-container">
+            <SupplyCard v-for="item in getItems" :item="item" />
+        </div>
     </v-container>
 </template>
 
 <style scoped>
+    .control-panel {
+        margin-bottom: 1.25rem;
+    }
+    
     .clear-btn {
         font-size: 1rem;
         color: #968878;
@@ -122,5 +124,45 @@
         letter-spacing: normal;
         width: 45%;
         border-color: #E4DAC8;
+    }
+
+    .supplies-container {
+        display: grid;
+        grid-gap: 1.25rem;
+        grid-template-columns: repeat(4, 1fr);
+        padding-bottom: 1.25rem;
+    }
+
+    @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 480px)
+        and (-webkit-min-device-pixel-ratio: 2) {
+        .supplies-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media only screen 
+        and (min-device-width: 768px) 
+        and (max-device-width: 1024px) 
+        and (orientation: portrait) {
+        .supplies-container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media only screen 
+        and (min-device-width: 768px) 
+        and (max-device-width: 1024px) 
+        and (orientation: landscape) {
+        .supplies-container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media screen and (min-width: 1904px) {
+        .supplies-container {
+            grid-template-columns: repeat(6, 1fr);
+        }
     }
 </style>

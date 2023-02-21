@@ -16,29 +16,26 @@ export const useSuppliesStore = defineStore("supplies", {
         isFiltered(state) {
             return state.orderBy || state.isRation || state.bonus || state.searchPhrase;
         },
-        chunkedList(state) {
-            return (itemsPerRow) => {
-                let itemsList = lodash.cloneDeep(state.items);
-                if (state.searchPhrase && state.searchPhrase.trim()) {
-                    const phrase = state.searchPhrase.trim().toLowerCase();
-                    itemsList = lodash.filter(itemsList, function(o) {
-                        return o.name.toLowerCase().includes(phrase);
-                    });
-                }
-                if (state.isRation !== null) {
-                    itemsList = lodash.filter(itemsList, { "extra_rations": state.isRation });
-                }
-                if (state.bonus) {
-                    itemsList = lodash.filter(itemsList, function(o) {
-                        return o.bonuses[state.bonus] > 0;
-                    });
-                }
-                if (state.orderBy) {
-                    itemsList = lodash.orderBy(itemsList, state.orderBy.field, state.orderBy.order);
-                }
-                const chunked = lodash.chunk(Object.values(itemsList), itemsPerRow);
-                return chunked.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
-            };   
+        getItems(state) {
+            let itemsList = lodash.cloneDeep(state.items);
+            if (state.searchPhrase && state.searchPhrase.trim()) {
+                const phrase = state.searchPhrase.trim().toLowerCase();
+                itemsList = lodash.filter(itemsList, function(o) {
+                    return o.name.toLowerCase().includes(phrase);
+                });
+            }
+            if (state.isRation !== null) {
+                itemsList = lodash.filter(itemsList, { "extra_rations": state.isRation });
+            }
+            if (state.bonus) {
+                itemsList = lodash.filter(itemsList, function(o) {
+                    return o.bonuses[state.bonus] > 0;
+                });
+            }
+            if (state.orderBy) {
+                itemsList = lodash.orderBy(itemsList, state.orderBy.field, state.orderBy.order);
+            }
+            return itemsList;
         },
         itemById(state) {
             return (itemId) => {

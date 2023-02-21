@@ -32,6 +32,6 @@
   }
 
   ul li a.router-link-exact-active {
-    color: #96C9CF;
+    color: #81ACB1;
   }
 </style>

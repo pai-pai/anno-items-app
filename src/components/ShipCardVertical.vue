@@ -54,9 +54,21 @@
         font-size: 0.75rem;
     }
 
+    .ship-card-vertical:hover {
+        cursor: pointer;
+    }
+
+    .ship-card-vertical:hover {
+        border-width: 2px;
+    }
+
+    .active .ship-card-vertical {
+        border: 2px solid #968878;
+    }
+
+    .ship-card-vertical:hover,
     .active .ship-card-vertical {
         padding: calc(0.375rem - 1px);
-        border: 2px solid #968878;
     }
 
     .locked .ship-card-vertical::before {

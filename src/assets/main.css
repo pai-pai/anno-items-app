@@ -141,7 +141,7 @@ ul.flat-list li {
 }
 
 .goods-picker-drag-zone-container .v-selection-control .v-label {
-    height: 1.25rem;
+    line-height: 1rem;
 }
 
 header.v-app-bar.v-toolbar:not(.v-toolbar--flat) {

@@ -14,20 +14,17 @@ export const useShipsStore = defineStore("ships", {
         isFiltered(state) {
             return state.orderBy || state.shipType;
         },
-        chunkedList(state) {
-            return (itemsPerRow) => {
-                let itemsList = lodash.cloneDeep(state.items);
-                if (state.shipType) {
-                    itemsList = lodash.filter(itemsList, function(o) {
-                        return o.types.includes(state.shipType);
-                    });
-                }
-                if (state.orderBy) {
-                    itemsList = lodash.orderBy(itemsList, state.orderBy.field, state.orderBy.order);
-                }
-                const chunked = lodash.chunk(Object.values(itemsList), itemsPerRow);
-                return chunked.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
+        getItems(state) {
+            let itemsList = lodash.cloneDeep(state.items);
+            if (state.shipType) {
+                itemsList = lodash.filter(itemsList, function(o) {
+                    return o.types.includes(state.shipType);
+                });
             }
+            if (state.orderBy) {
+                itemsList = lodash.orderBy(itemsList, state.orderBy.field, state.orderBy.order);
+            }
+            return itemsList;
         },
         activeShip(state) {
             return state.items.find(item => item.active);
