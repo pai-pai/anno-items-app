@@ -21,8 +21,10 @@
             items: [],
             ships: [],
             supplies: [],
+            showDetails: false,
             showItemsFilters: false,
             showSuppliesFilters: false,
+            dragDropZoneCount: 0,
         }),
         components: {
             Badge,
@@ -89,7 +91,7 @@
             const supplies = storeToRefs(suppliesStore).items;
             const {
                 ship, pickedItems, rationBonus, moraleBonus, traits,
-                searchItem, itemsBonusesFilter,
+                pickedShipItems, searchItem, itemsBonusesFilter,
                 searchSupply, suppliesBonusesFilter, suppliesRationFilter
             } = storeToRefs(expeditionStore);
             const { name } = useDisplay();
@@ -131,6 +133,7 @@
                 reset: () => expeditionStore.reset(),
                 pickedShip: ship,
                 pickedItems,
+                pickedShipItems,
                 expeditionStore,
                 itemsStore,
                 suppliesStore,
@@ -160,6 +163,14 @@
                     values: [ this.rationBonus ? "Yes": "No", this.moraleBonus ],
                     columns: 1
                 }
+            },
+            availableShipItemSlots() {
+                if (!this.pickedShip) return;
+                return Math.max(this.pickedShip.item_slots - this.pickedShipItems.length, 0);
+            },
+            availableRegularSlots() {
+                if (!this.pickedShip) return;
+                return this.pickedShip.total_slots - this.pickedItems.length - this.availableShipItemSlots;
             }
         },
         methods: {
@@ -177,18 +188,52 @@
                 if (this.pickedShip.total_slots === this.pickedItems.length) {
                     return;
                 }
+                const dropZone = document.querySelector(".goods-picker-drop-zone");
+                if (dropZone) {
+                    dropZone.classList.add("dragover");
+                }
+                const crt = evt.target.cloneNode(true);
+                crt.setAttribute("id", `${item._id}-clone`);
+                crt.style.position = "absolute";
+                crt.style.top = "-1000px";
+                crt.style.right = "-1000px";
+                crt.style.zIndex = "10000";
+                crt.style.cursor = "grabbing";
+                document.body.appendChild(crt);
+                evt.dataTransfer.setDragImage(crt, 10, 10);
                 evt.dataTransfer.dropEffect = "move";
                 evt.dataTransfer.effectAllowed = "move";
                 evt.dataTransfer.setData("itemId", item._id);
                 evt.dataTransfer.setData("itemType", itemType);
             },
+            dragMovingItem(evt) {
+                evt.target.style.cursor = "grabbing";
+            },
+            resetDropzone() {
+                this.dragDropZoneCount = 0;
+                const dropZone = document.querySelector(".goods-picker-drop-zone");
+                if (dropZone) {
+                    dropZone.classList.remove("dragover");
+                }
+            },
+            dragItemEnd(evt, item) {
+                this.resetDropzone();
+                evt.target.style.removeProperty("cursor");
+                const crt = document.getElementById(`${item._id}-clone`);
+                if (!crt) { return; }
+                crt.remove();
+            },
             dropItem(evt) {
+                this.resetDropzone();
                 const itemType = evt.dataTransfer.getData("itemType");
                 const store = itemType == "item" ? this.itemsStore : this.suppliesStore;
                 const dropedItem = store.itemById(evt.dataTransfer.getData("itemId"));
                 if (dropedItem) {
                     this.expeditionStore.pickItem(dropedItem);
                 }
+            },
+            toggleDetails() {
+                this.showDetails = !this.showDetails;
             },
             toggleFiltersItems() {
                 this.showItemsFilters = !this.showItemsFilters;
@@ -249,25 +294,75 @@
 
         <template v-if="pickedShip">
             <v-row justify="start" class="goods-picker-drop-zone-container">
-                <div class="text-h6 secondary-text-color pt-8 pb-1">Add specialists, items and supplies</div>
+                <div class="text-h6 secondary-text-color pt-8">
+                    Add specialists, items and supplies
+                    <v-btn
+                        v-if="showDetails"
+                        append-icon="expand_less"
+                        variant="outlined"
+                        class="filters-btn"
+                        @click="toggleDetails"
+                    >Hide details</v-btn>
+                    <v-btn
+                        v-else
+                        append-icon="expand_more"
+                        variant="outlined"
+                        class="filters-btn"
+                        @click="toggleDetails"
+                    >Show details</v-btn>
+                </div>
                 <div
-                    class="goods-picker-drop-zone mb-3"
+                    class="goods-picker-drop-zone"
+                    :style="[`grid-template-columns: repeat(${ pickedShip.total_slots }, 5.25rem) auto;`]"
                     @drop="dropItem($event)"
                     @dragover.prevent
                     @dragenter.prevent
                 >
-                    <Badge
+                    <div
                         v-for="(item, index) in pickedItems"
-                        :class="[`item-rarity-${item.rarity_order === undefined ? '-1': item.rarity_order } ${ isShipItem(item) ? 'ship-item' : '' }`]"
-                        :image_src="item.image_src"
-                        height="4.375rem"
-                        width="4.375rem"
-                        clearable
-                        @remove="removeItem(item, index)"
-                    />
-                    <div class="empty-badge" v-for="index in (pickedShip.total_slots - pickedItems.length)"></div>
+                        class="tabular-column"
+                        :style="[`grid-column: ${ index + 1 } / ${ index + 2 };`]"
+                    >
+                        <Badge
+                            :class="[`item-rarity-${item.rarity_order === undefined ? '-1': item.rarity_order } ${ isShipItem(item) ? 'ship-item' : '' }`]"
+                            :image_src="item.image_src"
+                            height="4.375rem"
+                            width="4.375rem"
+                            clearable
+                            @remove="removeItem(item, index)"
+                        />
+                        <template v-if="showDetails">
+                            <div
+                                v-for="(value, bonus) in item.bonuses"
+                                :class="[`bonus ${ bonus } value-${ !!value }`]"
+                                :title="[`${BONUSES_MAPPING[bonus]}`]"
+                            >
+                                {{ value ? value : '' }}
+                            </div>
+                            <div :class="[`bonus morale value-${ !!item.combined_morale_per_50t }`]" title="Morale">
+                                {{ item.combined_morale_per_50t ? item.combined_morale_per_50t : '' }}
+                            </div>
+                            <div class="bonus ration">{{ item.extra_rations ? 'Ration' : '' }}</div>
+                            <div class="bonus traits">{{ item.traits ? item.traits.join(' ') : '' }}</div>
+                        </template>
+                    </div>
+                    <div
+                        v-for="index in availableRegularSlots"
+                        class="tabular-column"
+                        :style="[`grid-column: ${ index + pickedItems.length } / ${ index + 1 + pickedItems.length };`]"
+                    >
+                        <div class="empty-badge regular"></div>
+                    </div>
+                    <div
+                        v-for="index in availableShipItemSlots"
+                        class="tabular-column"
+                        :style="[`grid-column: ${ availableRegularSlots + index + pickedItems.length } / ${ availableRegularSlots + index + 1 + pickedItems.length };`]"
+                    >
+                        <div class="empty-badge ship"></div>
+                    </div>
                 </div>
             </v-row>
+
             <v-row class="goods-picker-drag-zone-container">
                 <div>
                     <div class="items-control-panel">
@@ -278,6 +373,7 @@
                                 label="Find item by name"
                                 variant="underlined"
                                 density="compact"
+                                hide-details
                                 class="search-field"
                                 v-model="searchItem"
                             />
@@ -345,8 +441,10 @@
                                                 :image_src="it.image_src"
                                                 height="4.375rem"
                                                 width="4.375rem"
-                                                :draggable="pickedItems.length < pickedShip.total_slots"
+                                                :isdraggable="pickedItems.length < pickedShip.total_slots"
                                                 @dragstart="dragItem($event, it, 'item')"
+                                                @drag="dragMovingItem($event)"
+                                                @dragend="dragItemEnd($event, it)"
                                             >
                                                 <template #content>
                                                     <ItemTooltip :item="it" />
@@ -370,6 +468,7 @@
                                 label="Find goods by name"
                                 variant="underlined"
                                 density="compact"
+                                hide-details
                                 class="search-field"
                                 v-model="searchSupply"
                             />
@@ -431,8 +530,10 @@
                                 :image_src="supply.image_src"
                                 height="4.375rem"
                                 width="4.375rem"
-                                :draggable="pickedItems.length < pickedShip.total_slots"
+                                :isdraggable="pickedItems.length < pickedShip.total_slots"
                                 @dragstart="dragItem($event, supply, 'supply')"
+                                @drag="dragMovingItem($event)"
+                                @dragend="dragItemEnd($event, supply)"
                             >
                                 <template #content>
                                     <SupplyTooltip :item="supply" />
@@ -512,18 +613,111 @@
     }
 
     .goods-picker-drop-zone-container {
-        padding: 0 1rem;
+        padding: 0 1rem 1rem 1rem;
+    }
+
+    .goods-picker-drop-zone-container > div:first-child {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-bottom: 0.5rem;
     }
 
     .goods-picker-drop-zone {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
         width: 100%;
         min-height: 6.35rem;
         background: rgba(228, 218, 200, 0.32);
         border: 1px solid #E4DAC8;
         border-radius: 0.25rem;
         padding: 0.5rem;
+    }
+
+    .goods-picker-drop-zone.dragover {
+        background: rgba(244, 233, 220, 0.32);
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus {
+        min-height: 1.5rem;
+        text-align: right;
+        font-style: italic;
+        font-weight: bold;
+        line-height: 1.5rem;
+        padding: 0 0.25rem;
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus:nth-child(2n+1) {
+        background-color: #fcfbf9;
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus::before {
+        font-family: "anno-icons";
+        font-size: 1.25rem;
+        font-style: normal;
+        line-height: 1.5rem;
+        position: absolute;
+        left: 0.25rem;
+        color: rgba(150, 136, 120, 0.3);
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus:hover::before {
+        color: rgba(150, 136, 120, 0.8);
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.crafting::before {
+        content: "\e900";
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.faith::before {
+        content: "\e901";
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.diplomacy::before {
+        content: "\e902";
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.force::before {
+        content: "\e903";
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.hunting::before {
+        content: "\e904";
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.medicine::before {
+        content: "\e905";
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.naval_power::before {
+        content: "\e906";
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.navigation::before {
+        content: "\e907";
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.morale::before {
+        font-family: "Material Icons";
+        content: "\e87d";
+        color: rgba(150, 136, 120, 0.2);
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.value-true.morale:hover::before {
+        color: rgba(150, 136, 120, 0.7);
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.ration,
+    .goods-picker-drop-zone .tabular-column .bonus.traits
+     {
+        font-size: 0.75rem;
+        font-weight: normal;
+    }
+
+    .goods-picker-drop-zone .tabular-column .bonus.traits
+     {
+        line-height: 1.25rem;
+        text-align: left;
     }
 
     .empty-badge {
@@ -541,6 +735,17 @@
         position: absolute;
         left: 1.5rem;
         color: #E4DAC8;
+    }
+
+    .empty-badge.ship::after {
+        font-family: "anno-icons";
+        content: '\e908';
+        font-size: 4.375rem;
+        color: rgba(228, 218, 200, 0.3);
+        line-height: 5rem;
+        position: absolute;
+        left: 0.35rem;
+        z-index: 1;
     }
 
     .goods-picker-drag-zone-container {
@@ -568,9 +773,10 @@
     }
 
     .controls  {
+        width: 100%;
         display: flex;
         justify-content: space-between;
-        width: 100%;
+        padding-bottom: 0.5rem;
     }
 
     .filters-btn,
@@ -588,6 +794,7 @@
 
     .filters-panel {
         display: grid;
+        padding-top: 0.5rem;
         padding-bottom: 1rem;
         grid-template-columns: 3fr 2fr;
     }
@@ -691,8 +898,23 @@
         }
     }
 
-    @media screen and (min-width: 1904px) {
+    @media (min-width: 960px) and (max-width: 1264px) {
         .stats-panel {
+            grid-template-columns: 3.5fr 1.5fr 2fr 1fr;
+            max-width: 900px;
+        }
+    }
+
+    @media (min-width: 1264px) and (max-width: 1904px) {
+        .stats-panel {
+            grid-template-columns: 3fr 1.25fr 3fr 1.75fr;
+            max-width: 1200px;
+        }
+    }
+
+    @media (min-width: 1904px) {
+        .stats-panel {
+            grid-template-columns: 3fr 1.25fr 3fr 6fr;
             max-width: 1800px;
         }
 

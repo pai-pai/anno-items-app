@@ -72,6 +72,11 @@ export const useExpeditionStore = defineStore("expedition", {
                     itemsList = itemsList.filter((item) => state.itemsBonusesFilter.every(
                         (bonus) => item.bonuses[bonus] > 0
                     ));
+                    itemsList = lodash.orderBy(
+                        itemsList,
+                        state.itemsBonusesFilter.map(bonus => `bonuses.${bonus}`).concat("name"),
+                        Array(state.itemsBonusesFilter.length).fill("desc").concat("asc")
+                    );
                 }
                 const chunked = lodash.chunk(Object.values(itemsList), itemsPerRow);
                 return chunked.map((el, index) => ({ id: `row-${index}`, rowData: el }) );
@@ -91,6 +96,11 @@ export const useExpeditionStore = defineStore("expedition", {
                 itemsList = itemsList.filter((item) => state.suppliesBonusesFilter.every(
                     (bonus) => item.bonuses[bonus] > 0
                 ));
+                itemsList = lodash.orderBy(
+                    itemsList,
+                    state.suppliesBonusesFilter.map(bonus => `bonuses.${bonus}`).concat("combined_morale_per_50t"),
+                    Array(state.suppliesBonusesFilter.length).fill("desc").concat("desc")
+                );
             }
             return itemsList;
         },

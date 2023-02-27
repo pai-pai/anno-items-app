@@ -15,16 +15,20 @@
         <div class="item-tooltip-container-name">{{ item.name }}</div>
         <div class="item-tooltip-container-bonuses">
             <template v-for="(value, key) in item.bonuses">
-                <p v-if="value" :class="[`bonus bonus-${key}`]">
+                <p
+                    v-if="value"
+                    :class="[`bonus bonus-${key}`]"
+                >
                     <i :class="[`ic icon-${key}`]"></i>{{ value }}
                 </p>
             </template>
+            <p v-if="item.combined_morale_per_50t">
+                <v-icon icon="md:favorite" />{{ item.combined_morale_per_50t }}
+            </p>
         </div>
-        <template v-if="item.extra_rations">
-            <div class="item-tooltip-container-traits">
-                <p class="smallest-text font-italic">Ration</p>
-            </div>
-        </template>
+        <div v-if="item.extra_rations" class="item-tooltip-container-traits">
+            <p class="smallest-text font-italic">Ration</p>
+        </div>
     </AnnoCard>
 </template>
 

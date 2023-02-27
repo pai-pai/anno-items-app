@@ -19,7 +19,7 @@
                 let labels = [ "Cargo Slots", "Item Slots" ];
                 Object.keys(this.item.bonuses).forEach((bonus) => { labels.push(BONUSES_MAPPING[bonus]); });
                 return {
-                    titles: [ "Slots", "Expedition Bonuses" ],
+                    titles: [ "Slots", "Expedition bonuses" ],
                     labels: labels,
                     values: values,
                     columns: 2
@@ -46,7 +46,7 @@
                 </div>
             </div>
             
-            <ColumnsBlock :columnsConfig="ShipsColumnsConfig" />
+            <ColumnsBlock :columnsConfig="ShipsColumnsConfig" density="compact" />
         </AnnoCard>
     </v-lazy>
   </template>

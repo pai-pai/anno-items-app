@@ -31,7 +31,8 @@
     text-decoration: none;
   }
 
+  ul li a:hover,
   ul li a.router-link-exact-active {
-    color: #81ACB1;
+    color: #37A298;
   }
 </style>

@@ -6,6 +6,16 @@
         name: "Bonuses",
         props: {
             columnsConfig: Object,
+            density: {
+                type: String,
+                default: "default",
+                validator: function(value) {
+                    return [
+                        "default",
+                        "compact",
+                    ].includes(value);
+                },
+            },
         },
         components: {
             ColumnRow
@@ -29,7 +39,7 @@
 </script>
 
 <template>
-    <v-container :class="[`bonuses small-text columns-${configuration.cols} pa-0`]">
+    <v-container :class="[`bonuses small-text columns-${configuration.cols} pa-0 density-${density}`]">
         <template v-if="configuration.titles">
             <v-row no-gutters class="secondary-text-color justify-space-between font-italic">
                 <v-col
@@ -54,11 +64,23 @@
 </template>
 
 <style scoped>
+    .bonuses.columns-2 [class*="columns-block-column-"] {
+        align-self: flex-end;
+    }
+
     .bonuses.columns-2 .columns-block-column-1 {
         padding-right: 1rem;
     }
 
     .bonuses.columns-2 .columns-block-column-2 {
         padding-left: 1rem;
+    }
+
+    .bonuses.columns-2.density-compact .columns-block-column-1 {
+        padding-right: 1.5rem;
+    }
+
+    .bonuses.columns-2.density-compact .columns-block-column-2 {
+        padding-left: 0.4rem;
     }
 </style>

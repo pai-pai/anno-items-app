@@ -72,7 +72,9 @@
 </script>
 
 <template>
-    <v-progress-circular v-if="items.length === 0" indeterminate :size="50" />
+    <v-container class="d-flex justify-center align-center h-100" v-if="items.length === 0">
+        <v-progress-circular bg-color="rgba(55, 162, 152, 0.2)" color="#37A298" indeterminate :size="50" />
+    </v-container>
 
     <v-container v-else>
         <v-row justify="start" class="control-panel mt-5">

@@ -21,7 +21,7 @@
                 let labels = [ "Base", "Per 50t" ];
                 Object.keys(bonuses).forEach((bonus) => { labels.push(BONUSES_MAPPING[bonus]); });
                 return {
-                    titles: [ "Morale", "Expedition Bonuses" ],
+                    titles: [ "Morale", "Expedition bonuses" ],
                     labels: labels,
                     values: values,
                     columns: 2
@@ -48,7 +48,7 @@
                 </div>
             </div>
             
-            <ColumnsBlock :columnsConfig="SupplyColumnsConfig" />
+            <ColumnsBlock :columnsConfig="SupplyColumnsConfig" density="compact" />
         </AnnoCard>
     </v-lazy>
   </template>

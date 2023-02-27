@@ -41,6 +41,10 @@
         border-radius: 0.25rem;
     }
 
+    .item-bage[draggable="true"] {
+        cursor: grab;
+    }
+
     [class*="item-rarity-"] {
         border-width: 2px;
         border-style: solid;
@@ -86,6 +90,10 @@
         left: 0.15rem;
         top: 0.15rem;
         z-index: 1;
+    }
+
+    .item-bage img {
+        pointer-events: none;
     }
 
     .remove-btn {

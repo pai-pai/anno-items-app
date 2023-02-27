@@ -29,6 +29,11 @@
     font-size: 0.75rem;
 }
 
+[class*="text-h"], .text-body-2 {
+    font-family: Lato, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+        Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif !important;
+}
+
 ul.flat-list li {
     display: inline;
 }
