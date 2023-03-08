@@ -19,7 +19,12 @@
                 const values = [ this.item.base_morale, this.item.combined_morale_per_50t ].concat(
                     Object.values(bonuses));
                 let labels = [ "Base", "Per 50t" ];
-                Object.keys(bonuses).forEach((bonus) => { labels.push(BONUSES_MAPPING[bonus]); });
+                if (Object.values(bonuses).length > 0) {
+                    Object.keys(bonuses).forEach((bonus) => { labels.push(BONUSES_MAPPING[bonus]); });
+                } else {
+                    labels.push(" ");
+                    values.push("");
+                }
                 return {
                     titles: [ "Morale", "Expedition bonuses" ],
                     labels: labels,

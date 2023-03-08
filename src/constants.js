@@ -1,4 +1,4 @@
-export const APIURL = "http://0.0.0.0:8080";
+export const APIURL = import.meta.env.VITE_APIURL;
 export const BONUSES_MAPPING = {
     "crafting": "Crafting",
     "diplomacy": "Diplomacy",
