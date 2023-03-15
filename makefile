@@ -1,5 +1,5 @@
 IMAGE_REG ?= ghcr.io
-IMAGE_REPO ?= pai-pai/anno-items-app
+IMAGE_REPO ?= pai-pai/anno-items-vue
 IMAGE_TAG ?= latest
 
 image:
