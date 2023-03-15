@@ -1,4 +1,8 @@
 FROM node:alpine as build-stage
+
+LABEL Name="Anno 1800 Items Vue App" Version=1.0.0
+LABEL org.opencontainers.image.source = "https://github.com/pai-pai/anno-items-app"
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
