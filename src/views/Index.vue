@@ -8,9 +8,11 @@
     <div class="section-intro">
         <v-container class="py-0">
             <div class="intro">
-                <h2>Prepare to the expedition <span>with ease!</span></h2>
-                <p>Anno 1800 Expedition Helper is created to&nbsp;simplify the&nbsp;process of&nbsp;combining items and&nbsp;goods and&nbsp;help equip ships in&nbsp;a&nbsp;better&nbsp;way.</p>
-                <v-btn variant="outlined" class="try-btn" @click="$router.push('equip-expedition')">Let's begin</v-btn>
+                <div class="intro-text">
+                    <h2>Prepare to the expedition <span>with ease!</span></h2>
+                    <p>Anno 1800 Expedition Helper is created to&nbsp;simplify the&nbsp;process of&nbsp;combining items and&nbsp;goods and&nbsp;help equip ships in&nbsp;a&nbsp;better&nbsp;way.</p>
+                    <v-btn variant="outlined" class="try-btn" @click="$router.push('equip-expedition')">Let's begin</v-btn>
+                </div>
             </div>
         </v-container>
     </div>
@@ -325,5 +327,99 @@
 
     .section-guidance .guidance-block .guidance-text a {
         color: #37A298;
+    }
+
+    @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 480px)
+        and (orientation: portrait) {
+        .v-container {
+            padding: 0;
+        }
+        .intro2 {
+            padding: 14rem 2rem 8rem 2rem;
+            background-image: url("../assets/sailing_ship_57972f3c-6d28-4cc8-a116-53a852eaff56-2.webp");
+            background-size: cover;
+            background-position-x: 5%;
+        }
+
+        .intro {
+            padding: 10rem 2rem 12rem 2rem;
+            background-image: url(/src/assets/sailing_ship_57972f3c-6d28-4cc8-a116-53a852eaff56-2.webp);
+            background-size: cover;
+            background-position-x: 11%;
+            -webkit-transform: scaleX(-1);
+            transform: scaleX(-1);
+        }
+
+        .intro .intro-text {
+            -webkit-transform: scaleX(-1);
+            transform: scaleX(-1);
+            text-align: right;
+        }
+
+        .intro h2 {
+            width: 100%;
+        }
+
+        .intro p {
+            width: 100%;
+            font-size: 1.1rem;
+        }
+
+        .section-intro .try-btn,
+        .section-steps .try-btn {
+            font-size: 1.1rem;
+        }
+
+        .section-intro .try-btn {
+            margin-top: 2rem;
+        }
+    }
+
+    @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 960px) {
+        .step-row > div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-row:nth-child(2n+1) > div {
+            flex-direction: column-reverse;
+        }
+
+        .steps-title h2,
+        .section-guidance h2 {
+            padding: 0 1rem;
+        }
+
+        .step-text-block {
+            padding-top: 1rem;
+        }
+
+        .step-text-block h3 {
+            text-align: center;
+        }
+
+        .section-steps .try-btn {
+            max-width: 20rem;
+            margin: 2rem auto 0;
+        }
+
+        .section-guidance .guidance {
+            padding: 3rem 1rem 4rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-guidance .guidance,
+        .section-guidance .guidance .right-column {
+            row-gap: 2rem;
+        }
+
+        .section-guidance .guidance .guidance-img {
+            height: 220px;
+        }
     }
 </style>

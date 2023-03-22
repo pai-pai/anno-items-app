@@ -281,6 +281,9 @@
         <v-row justify="start" class="ships-picker">
             <div class="text-h6 secondary-text-color pt-8 pb-1">Pick a ship</div>
             <div class="ships-picker-container">
+                <v-container class="d-flex justify-center align-center" v-if="ships.length === 0">
+                    <v-progress-circular bg-color="rgba(55, 162, 152, 0.2)" color="#37A298" indeterminate :size="50" />
+                </v-container>
                 <Splide :options="{ rewind: true, gap: '0.625rem', autoWidth: true, arrows: false, pagination: false }">
                     <SplideSlide v-for="sh in ships">
                         <ShipCardVertical

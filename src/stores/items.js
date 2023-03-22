@@ -58,7 +58,7 @@ export const useItemsStore = defineStore("items", {
         },
         async fetchItems() {
             try {
-                const { data } = await axios.get(`${APIURL}/api/items`);
+                const { data } = await axios.get(`${APIURL}/items`);
                 this.items = data.objects;
                 this.filters = data._filters;
             } catch (error) {
