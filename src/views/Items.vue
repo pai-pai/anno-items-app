@@ -162,16 +162,16 @@
             <Transition name="slidedown">
                 <v-row v-if="isFiltered" justify="start" class="filters-panel pt-2">
                     <v-col cols="12">
-                        <v-chip class="mr-2 mb-2" v-if=orderBy closable @click:close="orderBy = null">
+                        <v-chip class="mr-2 mb-2" v-if="orderBy" closable @click:close="orderBy = null">
                             <v-icon icon="md:sort" class="mr-1"></v-icon>{{ sortByOptions.find(item => item.value === orderBy).title }}
                         </v-chip>
-                        <v-chip class="mr-2 mb-2" v-if=rarity closable @click:close="rarity = null">
+                        <v-chip class="mr-2 mb-2" v-if="rarity" closable @click:close="rarity = null">
                             Rarity: {{ rarity }}
                         </v-chip>
-                        <v-chip class="mr-2 mb-2" v-if=dlc closable @click:close="dlc = null">
+                        <v-chip class="mr-2 mb-2" v-if="dlc" closable @click:close="dlc = null">
                             DLC: {{ dlc }}
                         </v-chip>
-                        <v-chip class="mr-2 mb-2" v-if=trait closable @click:close="trait = null">
+                        <v-chip class="mr-2 mb-2" v-if="trait" closable @click:close="trait = null">
                             Trait: {{ trait }}
                         </v-chip>
                     </v-col>                 
@@ -355,9 +355,6 @@
         .filters-icon-btn {
             height: 3rem;
             width: 3rem;
-        }
-
-        .filters-icon-btn {
             color: #968878;
         }
 

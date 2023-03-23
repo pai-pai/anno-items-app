@@ -224,9 +224,6 @@
         .filters-icon-btn {
             height: 3rem;
             width: 3rem;
-        }
-
-        .filters-icon-btn {
             color: #968878;
         }
 

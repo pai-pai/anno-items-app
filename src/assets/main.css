@@ -148,14 +148,20 @@ ul.flat-list li {
 .control-panel .v-input__control .v-field,
 .filters-panel .v-input__control .v-field,
 .filters-drawer .v-input__control .v-field {
-    text-transform: capitalize;
     color: #574D44;
     --v-input-control-height: 2.5rem;
 }
 
 .v-menu .v-overlay__content > .v-list .v-list-item__content .v-list-item-title {
-    text-transform: capitalize;
     color: #574D44;
+}
+
+.control-panel .v-input__control .v-field:first-letter,
+.filters-panel .v-input__control .v-field:first-letter,
+.filters-drawer .v-input__control .v-field:first-letter,
+.v-menu .v-overlay__content > .v-list .v-list-item__content .v-list-item-title:first-letter,
+.filters-drawer .v-field__input .v-select__selection .v-select__selection-text::first-letter {
+    text-transform: uppercase
 }
 
 .goods-picker-drag-zone-container .filters-btn .v-btn__append {
