@@ -16,6 +16,14 @@
     font-size: 1.75rem;
 }
 
+.menu-overlay .v-overlay__scrim.bg-false {
+    display: none;
+}
+
+.menu-overlay .v-overlay__content {
+    width: 100%;
+}
+
 .regular-text {
     font-size: 1rem;
     line-height: 120%;
@@ -107,34 +115,53 @@ ul.flat-list li {
 .control-panel .v-col .v-field__clearable,
 .filters-panel .v-col .v-field__clearable,
 .goods-picker-drag-zone-container .v-field__clearable,
+.filters-drawer .v-col .v-field__clearable,
 .control-panel .v-col .v-field__append-inner,
 .filters-panel .v-col .v-field__append-inner,
-.goods-picker-drag-zone-container .v-field__append-inner {
+.goods-picker-drag-zone-container .v-field__append-inner,
+.filters-drawer .v-col .v-field__append-inner {
     align-items: center;
 }
 
 .control-panel .v-col .v-field__clearable > .v-icon,
 .filters-panel .v-col .v-field__clearable > .v-icon,
-.goods-picker-drag-zone-container .v-field__clearable > .v-icon {
+.goods-picker-drag-zone-container .v-field__clearable > .v-icon,
+.filters-drawer .v-field__clearable > .v-icon {
     font-size: 1rem;
 }
 
 .control-panel label.v-label.v-field-label,
 .filters-panel label.v-label.v-field-label,
-.goods-picker-drag-zone-container label.v-label.v-field-label {
+.goods-picker-drag-zone-container label.v-label.v-field-label,
+.filters-drawer label.v-label.v-field-label {
     line-height: 1rem;
     top: 1.25rem;
 }
 
 .control-panel label.v-label.v-field-label.v-field-label--floating,
 .filters-panel label.v-label.v-field-label.v-field-label--floating,
-.goods-picker-drag-zone-container label.v-label.v-field-label.v-field-label--floating {
+.goods-picker-drag-zone-container label.v-label.v-field-label.v-field-label--floating,
+.filters-drawer label.v-label.v-field-label.v-field-label--floating {
     top: 0.65rem;
 }
 
 .control-panel .v-input__control .v-field,
-.filters-panel .v-input__control .v-field {
+.filters-panel .v-input__control .v-field,
+.filters-drawer .v-input__control .v-field {
+    color: #574D44;
     --v-input-control-height: 2.5rem;
+}
+
+.v-menu .v-overlay__content > .v-list .v-list-item__content .v-list-item-title {
+    color: #574D44;
+}
+
+.control-panel .v-input__control .v-field:first-letter,
+.filters-panel .v-input__control .v-field:first-letter,
+.filters-drawer .v-input__control .v-field:first-letter,
+.v-menu .v-overlay__content > .v-list .v-list-item__content .v-list-item-title:first-letter,
+.filters-drawer .v-field__input .v-select__selection .v-select__selection-text::first-letter {
+    text-transform: uppercase
 }
 
 .goods-picker-drag-zone-container .filters-btn .v-btn__append {

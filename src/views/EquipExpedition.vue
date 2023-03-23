@@ -94,15 +94,27 @@
                 pickedShipItems, searchItem, itemsBonusesFilter,
                 searchSupply, suppliesBonusesFilter, suppliesRationFilter
             } = storeToRefs(expeditionStore);
-            const { name } = useDisplay();
+            const { name, mdAndDown, width } = useDisplay();
+            const narrowScreen = computed(() => {
+                return width.value <= 960;
+            }); 
             const itemsPerRow = computed(() => {
+                const widthValue = width.value;
+                if (widthValue < 320) return 2;
+                if (widthValue < 410) return 3;
+                if (widthValue < 498) return 4;
+                if (widthValue < 586) return 5;
+                if (widthValue < 675) return 6;
+                if (widthValue < 764) return 7;
+                if (widthValue < 853) return 8;
+                if (widthValue < 942) return 9;
                 switch (name.value) {
-                    case "xs": return 4
-                    case "sm": return 5
-                    case "md": return 5
-                    case "lg": return 7
-                    case "xl": return 10
-                    case "xxl": return 10
+                    case "xs": return 4;
+                    case "sm": return 5;
+                    case "md": return 5;
+                    case "lg": return 7;
+                    case "xl": return 10;
+                    case "xxl": return 10;
                 }
             });
 
@@ -138,6 +150,8 @@
                 itemsStore,
                 suppliesStore,
                 itemsPerRow,
+                mdAndDown,
+                narrowScreen,
                 BONUSES_MAPPING,
                 searchItem,
                 itemsBonusesFilter,
@@ -146,6 +160,8 @@
                 suppliesRationFilter,
                 itemsFiltered: computed(() => expeditionStore.itemsFiltered),
                 suppliesFiltered: computed(() => expeditionStore.suppliesFiltered),
+                changeItemsFilter: (value) => expeditionStore.changeItemsFilter(value),
+                changeSuppliesFilter: (value) => expeditionStore.changeSuppliesFilter(value),
                 clearFilters: (itemType) => expeditionStore.clearFilters(itemType),
             }
         },
@@ -254,6 +270,17 @@
                 container.style.maxHeight = blockHeight + "px";
                 scroller.style.maxHeight = blockHeight - containerScrollerDiff + "px";
                 if (innerScroller) { innerScroller.style.maxHeight = scroller.style.maxHeight; }
+            },
+            toggleSection(evt) {
+                if (evt.target.classList.contains("folded")) {
+                    evt.target.parentNode.childNodes[1].classList.remove("d-none");
+                    evt.target.parentNode.childNodes[2].classList.remove("d-none");
+                    evt.target.classList.remove("folded");
+                } else {
+                    evt.target.classList.add("folded");
+                    evt.target.parentNode.childNodes[1].classList.add("d-none");
+                    evt.target.parentNode.childNodes[2].classList.add("d-none");
+                }
             }
         }
     })
@@ -262,25 +289,60 @@
 <template>
     <v-container class="mb-5 pt-0">
         <div class="stats-panel font-italic">
-            <div class="bonuses-section">
-                <ColumnsBlock :columnsConfig="bonusesColumnsConfig" />
-            </div>
-            <div class="ration-morale-section">
-                <ColumnsBlock :columnsConfig="additionalBonusesConfig" />
-            </div>
-            <div class="traits-section">
-                <div class="label">Traits</div>
-                <div class="value font-weight-bold">{{ traits.join(", ") || "-" }}</div>
-            </div>
-            <div :class="[`text-right reset-expedition ${ pickedShip ? '': 'disabled' }`]">
-                <v-icon icon="md:refresh" @click="reset()"></v-icon>
-            </div>
+                <v-container class="pa-0 w-100">
+                    <v-row :class="[`${ narrowScreen ? 'pt-3' : '' } ma-0`]">
+                        <v-col cols="11" :class="[`${ narrowScreen ? 'py-0' : 'pa-0' }`]">
+                            <div class="bonuses-row">
+                                <div style="grid-area: crafting-l">Crafting</div>
+                                <div style="grid-area: crafting-v" class="font-weight-bold">{{ expeditionBonuses.crafting || "-" }}</div>
+                                <div style="grid-area: hunting-l">Hunting</div>
+                                <div style="grid-area: hunting-v" class="font-weight-bold">{{ expeditionBonuses.hunting || "-" }}</div>
+
+                                <div style="grid-area: diplomacy-l">Diplomacy</div>
+                                <div style="grid-area: diplomacy-v" class="font-weight-bold">{{ expeditionBonuses.diplomacy || "-" }}</div>
+                                <div style="grid-area: medicine-l">Medicine</div>
+                                <div style="grid-area: medicine-v" class="font-weight-bold">{{ expeditionBonuses.medicine || "-" }}</div>
+
+                                <div style="grid-area: faith-l">Faith</div>
+                                <div style="grid-area: faith-v" class="font-weight-bold">{{ expeditionBonuses.faith || "-" }}</div>
+                                <div style="grid-area: naval-power-l">Naval Power</div>
+                                <div style="grid-area: naval-power-v" class="font-weight-bold">{{ expeditionBonuses.naval_power || "-" }}</div>
+
+                                <div style="grid-area: force-l">Force</div>
+                                <div style="grid-area: force-v" class="font-weight-bold">{{ expeditionBonuses.force || "-" }}</div>
+                                <div style="grid-area: navigation-l">Navigation</div>
+                                <div style="grid-area: navigation-v" class="font-weight-bold">{{ expeditionBonuses.navigation || "-" }}</div>
+
+                                <div style="grid-area: ration-l" :class="[`${narrowScreen ? 'py-2' : ''}`]">Ration</div>
+                                <div style="grid-area: ration-v" :class="[`${narrowScreen ? 'py-2' : ''} font-weight-bold`]">{{ rationBonus ? "Yes": "No" }}</div>
+                                <div style="grid-area: morale-l" :class="[`${narrowScreen ? 'py-2' : ''}`]">Morale</div>
+                                <div style="grid-area: morale-v" :class="[`${narrowScreen ? 'py-2' : ''} font-weight-bold`]">{{ moraleBonus || "-" }}</div>
+
+                                <div style="grid-area: traits-l">Traits</div>
+                                <div style="grid-area: traits-v" class="font-weight-bold">{{ traits.join(", ") || "-" }}</div>
+                            </div>
+                        </v-col>
+                        <v-col cols="1" class="pa-0 text-right">
+                            <v-btn
+                                :disabled="!pickedShip"
+                                variant="plain"
+                                class="reset-expedition action-btn-icon pa-0"
+                                @click="reset()"
+                            ><v-icon icon="md:refresh"></v-icon></v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
             <div class="divider"></div>
         </div>
 
         <v-row justify="start" class="ships-picker">
-            <div class="text-h6 secondary-text-color pt-8 pb-1">Pick a ship</div>
+            <div class="text-h6 secondary-text-color pt-8 pb-1">
+                Pick a ship
+            </div>
             <div class="ships-picker-container">
+                <v-container class="d-flex justify-center align-center" v-if="ships.length === 0">
+                    <v-progress-circular bg-color="rgba(55, 162, 152, 0.2)" color="#37A298" indeterminate :size="50" />
+                </v-container>
                 <Splide :options="{ rewind: true, gap: '0.625rem', autoWidth: true, arrows: false, pagination: false }">
                     <SplideSlide v-for="sh in ships">
                         <ShipCardVertical
@@ -294,22 +356,23 @@
 
         <template v-if="pickedShip">
             <v-row justify="start" class="goods-picker-drop-zone-container">
-                <div class="text-h6 secondary-text-color pt-8">
+                <div class="text-h6 secondary-text-color pt-8 pb-1">
                     Add specialists, items and supplies
                     <v-btn
-                        v-if="showDetails"
-                        append-icon="expand_less"
-                        variant="outlined"
-                        class="filters-btn"
+                        v-if="narrowScreen" 
+                        :disabled="pickedItems.length === 0 && !showDetails"
+                        variant="plain"
+                        class="action-btn-icon pa-0"
                         @click="toggleDetails"
-                    >Hide details</v-btn>
+                    ><v-icon :icon="`${ showDetails ? 'md:expand_less': 'md:expand_more' }`"></v-icon></v-btn>
                     <v-btn
                         v-else
-                        append-icon="expand_more"
+                        :disabled="pickedItems.length === 0 && !showDetails"
                         variant="outlined"
                         class="filters-btn"
                         @click="toggleDetails"
-                    >Show details</v-btn>
+                        :append-icon="`${ showDetails ? 'expand_less': 'expand_more' }`"
+                    >{{ showDetails ? 'Hide details' : 'Show details' }}</v-btn>
                 </div>
                 <div
                     class="goods-picker-drop-zone"
@@ -365,56 +428,100 @@
 
             <v-row class="goods-picker-drag-zone-container">
                 <div>
+                    <div v-if="narrowScreen" class="text-h6 secondary-text-color pt-4 pb-0 toggler" @click="toggleSection($event)">
+                        Specialists & Items
+                    </div>
                     <div class="items-control-panel">
-                        <div class="controls">
-                            <v-text-field
-                                clearable
-                                clear-icon="close"
-                                label="Find item by name"
-                                variant="underlined"
-                                density="compact"
-                                hide-details
-                                class="search-field"
-                                v-model="searchItem"
-                            />
-                            <div class="btns">
-                                <v-btn
-                                    v-if="itemsFiltered"
-                                    variant="outlined"
-                                    class="clear-btn"
-                                    @click="clearFilters('item')"
-                                >Clear all</v-btn>
-                                <v-btn
-                                    v-if="showItemsFilters"
-                                    append-icon="expand_less"
-                                    variant="outlined"
-                                    class="filters-btn"
-                                    @click="toggleFiltersItems"
-                                >Hide filters</v-btn>
-                                <v-btn
-                                    v-else
-                                    append-icon="expand_more"
-                                    variant="outlined"
-                                    class="filters-btn"
-                                    @click="toggleFiltersItems"
-                                >Show filters</v-btn>
-                            </div>
-                        </div>
-                        <div class="filters-panel" v-if="showItemsFilters">
-                            <div class="bonuses-filter">
-                                <div class="column" v-for="part in [Object.entries(BONUSES_MAPPING).slice(0, 4), Object.entries(BONUSES_MAPPING).slice(4)]">
-                                    <v-checkbox
-                                        v-for="entry in part"
-                                        v-model="itemsBonusesFilter"
-                                        :label="entry[1]"
-                                        :value="entry[0]"
-                                        density="compact"
-                                        hide-details
-                                    ></v-checkbox>
+                        <template v-if="narrowScreen">
+                            <v-container class="controls pa-0">
+                                <v-row class="control-panel mt-5">
+                                    <v-col cols="9" class="px-3 py-0">
+                                        <v-text-field
+                                            clearable
+                                            clear-icon="close"
+                                            label="Find item by name"
+                                            variant="underlined"
+                                            density="compact"
+                                            class="search-field"
+                                            v-model="searchItem" />
+                                    </v-col>
+                                    <v-spacer></v-spacer>
+                                    <v-col cols="2" class="pl-0 pr-3 py-0 text-right">
+                                        <v-btn
+                                            color="#FFFEFB"
+                                            icon="md:filter_alt"
+                                            class="filters-icon-btn"
+                                            @click.stop="showItemsFilters = !showItemsFilters"
+                                        ></v-btn>
+                                    </v-col>
+                                </v-row>
+                            </v-container>
+                            <div class="filters-panel" v-if="itemsBonusesFilter.length > 0">
+                                <div class="bonuses-filter">
+                                    <template v-for="(value, key) in BONUSES_MAPPING">
+                                        <v-chip
+                                            class="mr-2 mb-2"
+                                            v-if="itemsBonusesFilter.includes(key)"
+                                            closable
+                                            @click:close="changeItemsFilter(key)"
+                                        >
+                                            {{ value }}
+                                        </v-chip>
+                                    </template>
                                 </div>
                             </div>
-                            <div></div>
-                        </div>
+                        </template>
+                        <template v-else>
+                            <div class="controls">
+                                <v-text-field
+                                    clearable
+                                    clear-icon="close"
+                                    label="Find item by name"
+                                    variant="underlined"
+                                    density="compact"
+                                    hide-details
+                                    class="search-field"
+                                    v-model="searchItem"
+                                />
+                                <div class="btns">
+                                    <v-btn
+                                        v-if="itemsFiltered"
+                                        variant="outlined"
+                                        class="clear-btn"
+                                        @click="clearFilters('item')"
+                                    >Clear all</v-btn>
+                                    <v-btn
+                                        v-if="showItemsFilters"
+                                        append-icon="expand_less"
+                                        variant="outlined"
+                                        class="filters-btn"
+                                        @click="toggleFiltersItems"
+                                    >Hide filters</v-btn>
+                                    <v-btn
+                                        v-else
+                                        append-icon="expand_more"
+                                        variant="outlined"
+                                        class="filters-btn"
+                                        @click="toggleFiltersItems"
+                                    >Show filters</v-btn>
+                                </div>
+                            </div>
+                            <div class="filters-panel" v-if="showItemsFilters">
+                                <div class="bonuses-filter">
+                                    <div class="column" v-for="part in [Object.entries(BONUSES_MAPPING).slice(0, 4), Object.entries(BONUSES_MAPPING).slice(4)]">
+                                        <v-checkbox
+                                            v-for="entry in part"
+                                            v-model="itemsBonusesFilter"
+                                            :label="entry[1]"
+                                            :value="entry[0]"
+                                            density="compact"
+                                            hide-details
+                                        ></v-checkbox>
+                                    </div>
+                                </div>
+                                <div></div>
+                            </div>
+                        </template>
                     </div>
                     <div class="items-container">
                         <div :class="[`items-drag-zone ${getItems(itemsPerRow).length === 0 ? 'd-flex' : ''}`]">
@@ -460,63 +567,115 @@
                 </div>
                 <div></div>
                 <div>
+                    <div v-if="narrowScreen" class="text-h6 secondary-text-color pt-7 pb-0 toggler" @click="toggleSection($event)">
+                        Supplies
+                    </div>
                     <div class="supplies-control-panel">
-                        <div class="controls">
-                            <v-text-field
-                                clearable
-                                clear-icon="close"
-                                label="Find goods by name"
-                                variant="underlined"
-                                density="compact"
-                                hide-details
-                                class="search-field"
-                                v-model="searchSupply"
-                            />
-                            <div class="btns">
-                                <v-btn
-                                    v-if="suppliesFiltered"
-                                    variant="outlined"
-                                    class="clear-btn"
-                                    @click="clearFilters('supply')"
-                                >Clear all</v-btn>
-                                <v-btn
-                                    v-if="showSuppliesFilters"
-                                    append-icon="expand_less"
-                                    variant="outlined"
-                                    class="filters-btn"
-                                    @click="toggleFiltersSupplies"
-                                >Hide filters</v-btn>
-                                <v-btn
-                                    v-else
-                                    append-icon="expand_more"
-                                    variant="outlined"
-                                    class="filters-btn"
-                                    @click="toggleFiltersSupplies"
-                                >Show filters</v-btn>
+                        <template v-if="narrowScreen">
+                            <v-container class="controls pa-0">
+                                <v-row class="control-panel mt-5">
+                                    <v-col cols="9" class="px-3 py-0">
+                                        <v-text-field
+                                            clearable
+                                            clear-icon="close"
+                                            label="Find goods by name"
+                                            variant="underlined"
+                                            density="compact"
+                                            class="search-field"
+                                            v-model="searchSupply" />
+                                    </v-col>
+                                    <v-spacer></v-spacer>
+                                    <v-col cols="2" class="pl-0 pr-3 py-0 text-right">
+                                        <v-btn
+                                            color="#FFFEFB"
+                                            icon="md:filter_alt"
+                                            class="filters-icon-btn"
+                                            @click.stop="showSuppliesFilters = !showSuppliesFilters"
+                                        ></v-btn>
+                                    </v-col>
+                                </v-row>
+                            </v-container>
+                            <div class="filters-panel" v-if="suppliesBonusesFilter.length > 0 || suppliesRationFilter">
+                                <div class="bonuses-filter">
+                                    <template v-for="(value, key) in BONUSES_MAPPING">
+                                        <v-chip
+                                            class="mr-2 mb-2"
+                                            v-if="suppliesBonusesFilter.includes(key)"
+                                            closable
+                                            @click:close="changeSuppliesFilter(key)"
+                                        >
+                                            {{ value }}
+                                        </v-chip>
+                                    </template>
+                                    <v-chip
+                                        class="mr-2 mb-2"
+                                        v-if="suppliesRationFilter"
+                                        closable
+                                        @click:close="suppliesRationFilter = false"
+                                    >
+                                        Ration
+                                    </v-chip>
+                                </div>
                             </div>
-                        </div>
-                        <div class="filters-panel" v-if="showSuppliesFilters">
-                            <div class="bonuses-filter">
-                                <div class="column" v-for="part in [Object.entries(BONUSES_MAPPING).slice(0, 4), Object.entries(BONUSES_MAPPING).slice(4)]">
+                        </template>
+                        <template v-else>
+                            <div class="controls">
+                                <v-text-field
+                                    clearable
+                                    clear-icon="close"
+                                    label="Find goods by name"
+                                    variant="underlined"
+                                    density="compact"
+                                    hide-details
+                                    class="search-field"
+                                    v-model="searchSupply"
+                                />
+                                <div class="btns">
+                                    <v-btn
+                                        v-if="suppliesFiltered"
+                                        variant="outlined"
+                                        class="clear-btn"
+                                        @click="clearFilters('supply')"
+                                    >Clear all</v-btn>
+                                    <v-btn
+                                        v-if="showSuppliesFilters"
+                                        append-icon="expand_less"
+                                        variant="outlined"
+                                        class="filters-btn"
+                                        @click="toggleFiltersSupplies"
+                                    >Hide filters</v-btn>
+                                    <v-btn
+                                        v-else
+                                        append-icon="expand_more"
+                                        variant="outlined"
+                                        class="filters-btn"
+                                        @click="toggleFiltersSupplies"
+                                    >Show filters</v-btn>
+                                </div>
+                            </div>
+                            <div class="filters-panel" v-if="showSuppliesFilters">
+                                <div class="bonuses-filter">
+                                    <div class="column" v-for="part in [Object.entries(BONUSES_MAPPING).slice(0, 4), Object.entries(BONUSES_MAPPING).slice(4)]">
+                                        <v-checkbox
+                                            v-for="entry in part"
+                                            v-model="suppliesBonusesFilter"
+                                            :label="entry[1]"
+                                            :value="entry[0]"
+                                            density="compact"
+                                            hide-details
+                                        ></v-checkbox>
+                                    </div>
+                                </div>
+                                <div class="ration-filter">
                                     <v-checkbox
-                                        v-for="entry in part"
-                                        v-model="suppliesBonusesFilter"
-                                        :label="entry[1]"
-                                        :value="entry[0]"
+                                        v-model="suppliesRationFilter"
+                                        label="Ration"
                                         density="compact"
                                         hide-details
                                     ></v-checkbox>
                                 </div>
                             </div>
-                            <div class="ration-filter">
-                                <v-checkbox
-                                    v-model="suppliesRationFilter"
-                                    label="Ration"
-                                    density="compact"
-                                    hide-details
-                                ></v-checkbox>
-                            </div>
-                        </div>
+                        </template>
                     </div>
                     <div class="supplies-container">
                         <div class="supplies-drag-zone">
@@ -544,13 +703,95 @@
                 </div>
             </v-row>
         </template>
+
+        <v-navigation-drawer
+            v-if="narrowScreen"
+            v-model="showItemsFilters"
+            color="#FFFEFB"
+            temporary
+        >
+            <v-container class="filters-drawer">
+                <v-row>
+                    <v-col cols="12" class="text-h6 secondary-text-color pt-0">
+                        Filter specialists & items
+                    </v-col>
+                </v-row>
+                <v-row v-for="(value, key) in BONUSES_MAPPING">
+                    <v-col cols="12" class="py-1">
+                        <v-checkbox
+                            v-model="itemsBonusesFilter"
+                            :label="value"
+                            :value="key"
+                            density="compact"
+                            hide-details
+                        ></v-checkbox>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" class="py-1">
+                        <v-btn
+                            v-if="itemsFiltered"
+                            variant="outlined"
+                            class="clear-btn mt-2 mx-0"
+                            @click="clearFilters('item')"
+                        >Clear all</v-btn>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-navigation-drawer>
+
+        <v-navigation-drawer
+            v-if="narrowScreen"
+            v-model="showSuppliesFilters"
+            color="#FFFEFB"
+            temporary
+        >
+            <v-container class="filters-drawer">
+                <v-row>
+                    <v-col cols="12" class="text-h6 secondary-text-color pt-0">
+                        Filter supplies
+                    </v-col>
+                </v-row>
+                <v-row v-for="(value, key) in BONUSES_MAPPING">
+                    <v-col cols="12" class="py-1">
+                        <v-checkbox
+                            v-model="suppliesBonusesFilter"
+                            :label="value"
+                            :value="key"
+                            density="compact"
+                            hide-details
+                        ></v-checkbox>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" class="py-1">
+                        <v-checkbox
+                            v-model="suppliesRationFilter"
+                            label="Ration"
+                            density="compact"
+                            hide-details
+                        ></v-checkbox>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="12" class="py-1">
+                        <v-btn
+                            v-if="suppliesFiltered"
+                            variant="outlined"
+                            class="clear-btn mt-2 mx-0"
+                            @click="clearFilters('supply')"
+                        >Clear all</v-btn>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-navigation-drawer>
     </v-container>
 </template>
 
 <style scoped>
     .stats-panel {
-        display: grid;
-        grid-template-columns: 3fr 1.25fr 3fr 1.75fr;
+        display: flex;
+        flex-direction: column;
         background: #FFFEFB;
         position: fixed;
         max-width: 1200px;
@@ -562,33 +803,19 @@
         transform: translateX(-50%);
     }
 
-    .stats-panel .bonuses {
-        padding: 0;
-        font-size: 1rem;
+    .bonuses-row {
+        display: grid;
+        grid-template-columns: 12% 2% 5% 12% 2% 5% 8% 2% 5% 8% auto;
+        grid-template-rows: auto;
+        grid-template-areas:
+            "crafting-l crafting-v . hunting-l hunting-v . ration-l ration-v . traits-l traits-v"
+            "diplomacy-l diplomacy-v . medicine-l medicine-v . morale-l morale-v . . ."
+            "faith-l faith-v . naval-power-l naval-power-v . . . . . ."
+            "force-l force-v . navigation-l navigation-v . . . . . ."
     }
 
-    .bonuses-section,
-    .ration-morale-section {
-        padding-right: 5rem;
-    }
-
-    .traits-section {
-        display: flex;
-        gap: 2rem;
-        font-size: 1rem;
-    }
-
-    .reset-expedition.disabled i,
-    .reset-expedition i {
-        color: rgba(87, 77, 68, 0.25)
-    }
-
-    .reset-expedition:not(.disabled) i:hover {
-        color: rgba(87, 77, 68, 0.75)
-    }
-
-    .reset-expedition.disabled i {
-        cursor: default;
+    .action-btn-icon {
+        min-width: 2.5rem;
     }
 
     .stats-panel .divider {
@@ -600,7 +827,6 @@
     }
 
     .ships-picker {
-        padding-top: 9rem;
         padding: 9rem 1rem 0 1rem;
     }
 
@@ -748,6 +974,19 @@
         z-index: 1;
     }
 
+    .goods-picker-drop-zone {
+        overflow-x: scroll;
+    }
+
+    .goods-picker-drop-zone {
+        -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer, Edge */
+        scrollbar-width: none; /* Hide scrollbar for Firefox */
+    }
+
+    .goods-picker-drop-zone::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+    }
+
     .goods-picker-drag-zone-container {
         display: grid;
         grid-template-columns: 7.1fr 0.7fr 5.1fr;
@@ -842,8 +1081,7 @@
     }
 
     .items-row {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
+        display: flex;
         padding-bottom: 0.25rem;
     }
 
@@ -858,33 +1096,92 @@
         margin: auto;
     }
 
-    @media only screen 
-        and (min-device-width: 768px) 
-        and (max-device-width: 1024px) 
-        and (orientation: landscape) {
-        .items-row {
-            grid-template-columns: repeat(5, 1fr);
+    @media screen and (min-width: 320px) and (max-width: 960px) {
+        .stats-panel {
+            padding-top: 0;
+        }
+
+        .bonuses-row {
+            grid-template-columns: 35% 12% auto 35% 12%;
+            grid-template-areas: 
+                "crafting-l crafting-v . hunting-l hunting-v"
+                "diplomacy-l diplomacy-v . medicine-l medicine-v"
+                "faith-l faith-v . naval-power-l naval-power-v"
+                "force-l force-v . navigation-l navigation-v"
+                "ration-l ration-v . morale-l morale-v"
+                "traits-l traits-v traits-v traits-v traits-v";
+        }
+
+        .supplies-container {
+            max-height: 31.125rem !important;
+        }
+
+        .items-drag-zone,
+        .supplies-drag-zone,
+        .scroller {
+            max-height: 30rem !important;
+        }
+
+        .toggler {
+            vertical-align: bottom;
+        }
+
+        .toggler::before {
+            font-family: "Material Icons";
+            content: "\e5d6";
+            font-size: 1.4rem;
+            color: rgba(150,136,120, 0.5);
+        }
+
+        .toggler.folded::before {
+            content: "\e5d7";
+        }
+
+        .filters-icon-btn {
+            height: 3rem;
+            width: 3rem;
+            color: #968878;
+        }
+
+        .filters-panel,
+        .filters-panel .bonuses-filter {
+            display: flex;
+        }
+
+        .filters-drawer {
+            padding-top: 2.7rem;
+        }
+
+        .clear-btn {
+            width: 45%;
+        }
+
+        .controls .control-panel {
+            margin: 0;
+        }
+
+        .supplies-control-panel .v-text-field {
+            max-width: none;
+        }
+
+        .ships-picker {
+            padding-top: 13rem;
+        }
+
+        .goods-picker-drop-zone-container > div.toggler {
+            display: block;
         }
 
         .goods-picker-drag-zone-container {
-            grid-template-columns: 7fr 0.5fr 5.65fr;
-        }
-
-        .supplies-control-panel .filters-panel {
-            grid-template-columns: 5fr 2fr;
+            display: flex;
+            flex-direction: column;
+            height: auto;
         }
     }
 
-    @media only screen 
-        and (min-device-width: 768px) 
-        and (max-device-width: 1024px) 
-        and (orientation: portrait) {
+    @media screen and (min-width: 960px) and (max-width: 1280px) {
         .stats-panel {
-            max-width: 100%;
-        }
-
-        .items-row {
-            grid-template-columns: repeat(5, 1fr);
+            max-width: 900px;
         }
 
         .goods-picker-drag-zone-container {
@@ -898,28 +1195,15 @@
         }
     }
 
-    @media (min-width: 960px) and (max-width: 1264px) {
+    @media screen and (min-width: 1280px) and (max-width: 1904px) {
         .stats-panel {
-            grid-template-columns: 3.5fr 1.5fr 2fr 1fr;
-            max-width: 900px;
-        }
-    }
-
-    @media (min-width: 1264px) and (max-width: 1904px) {
-        .stats-panel {
-            grid-template-columns: 3fr 1.25fr 3fr 1.75fr;
             max-width: 1200px;
         }
     }
 
     @media (min-width: 1904px) {
         .stats-panel {
-            grid-template-columns: 3fr 1.25fr 3fr 6fr;
             max-width: 1800px;
-        }
-
-        .items-row {
-            grid-template-columns: repeat(10, 1fr);
         }
 
         .goods-picker-drag-zone-container {

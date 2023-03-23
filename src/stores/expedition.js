@@ -133,6 +133,18 @@ export const useExpeditionStore = defineStore("expedition", {
         reset() {
             this.$reset();
         },
+        changeItemsFilter(value) {
+            const index = this.itemsBonusesFilter.indexOf(value);
+            if (index > -1) {
+                this.itemsBonusesFilter.splice(index, 1);
+            }
+        },
+        changeSuppliesFilter(value) {
+            const index = this.suppliesBonusesFilter.indexOf(value);
+            if (index > -1) {
+                this.suppliesBonusesFilter.splice(index, 1);
+            }
+        },
         clearFilters(itemType) {
             let filters = itemType === "item" ?
                 { searchItem: null, itemsBonusesFilter: [] } :

@@ -49,7 +49,7 @@ export const useShipsStore = defineStore("ships", {
         },
         async fetchItems() {
             try {
-                const { data } = await axios.get(`${APIURL}/api/ships`);
+                const { data } = await axios.get(`${APIURL}/ships`);
                 this.items = data.objects;
                 this.filters = data._filters;
             } catch (error) {

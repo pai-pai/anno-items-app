@@ -14,7 +14,7 @@ export const useSuppliesStore = defineStore("supplies", {
     }),
     getters: {
         isFiltered(state) {
-            return state.orderBy || state.isRation || state.bonus || state.searchPhrase;
+            return state.orderBy || state.isRation !== null || state.bonus || state.searchPhrase;
         },
         getItems(state) {
             let itemsList = lodash.cloneDeep(state.items);
@@ -54,7 +54,7 @@ export const useSuppliesStore = defineStore("supplies", {
         },
         async fetchItems() {
             try {
-                const { data } = await axios.get(`${APIURL}/api/supplies`);
+                const { data } = await axios.get(`${APIURL}/supplies`);
                 this.items = data.objects;
                 this.filters = data._filters;
             } catch (error) {

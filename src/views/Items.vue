@@ -47,6 +47,7 @@
                     case "xxl": return 6
                 }
             });
+            const { mdAndDown } = useDisplay();
 
             onBeforeMount(async () => {
                 if (itemsStore.items.length === 0) {
@@ -64,6 +65,7 @@
                 dlc,
                 trait,
                 searchPhrase,
+                mdAndDown,
                 isFiltered: computed(() => itemsStore.isFiltered),
                 clear: computed(() => itemsStore.clearFilters),
             }
@@ -76,76 +78,178 @@
         <v-progress-circular bg-color="rgba(55, 162, 152, 0.2)" color="#37A298" indeterminate :size="50" />
     </v-container>
 
-    <v-container v-else>
-        <v-row justify="start" class="control-panel mt-5">
-            <v-col cols="3" class="px-3 py-0">
-                <v-text-field
-                    clearable
-                    clear-icon="close"
-                    label="Search"
-                    variant="underlined"
-                    density="compact"
-                    class="search-field"
-                    v-model="searchPhrase" />
-            </v-col>
-            <v-spacer />
-            <v-col cols="3" class="px-3 pt-2 pb-0 justify-end d-flex">
-                <v-btn
-                    v-if="isFiltered"
-                    variant="outlined"
-                    class="clear-btn"
-                    @click="clear"
-                >Clear all</v-btn>
-                <v-btn
-                    v-if="showFilters"
-                    append-icon="expand_less"
-                    variant="outlined"
-                    class="filters-btn"
-                    @click="toggleFiltersPanel"
-                >Hide filters</v-btn>
-                <v-btn
-                    v-else
-                    append-icon="expand_more"
-                    variant="outlined"
-                    class="filters-btn"
-                    @click="toggleFiltersPanel"
-                >Show filters</v-btn>
-            </v-col>
-        </v-row>
-        <Transition name="slidedown">
-            <v-row v-if="showFilters" justify="start" class="filters-panel pt-2">
-                <v-col cols="3" class="px-3 py-0">
-                    <v-select
-                        :items="sortByOptions"
+    <v-container class="h-100" v-else>
+        <template v-if="mdAndDown">
+            <v-navigation-drawer
+                v-model="showFilters"
+                color="#FFFEFB"
+                temporary
+            >
+                <v-container class="filters-drawer">
+                    <v-row>
+                        <v-col cols="12" class="py-1">
+                            <v-select
+                                :items="sortByOptions"
+                                clearable
+                                clear-icon="close"
+                                variant="underlined"
+                                density="compact"
+                                label="Sort by"
+                                item-value="value"
+                                class="order-field"
+                                v-model="orderBy" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" class="py-1">
+                            <ClearableSelectInput
+                                :options="filters.rarity"
+                                label="Rarity"
+                                v-model="rarity" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" class="py-1">
+                            <ClearableSelectInput
+                                :options="filters.dlc"
+                                label="DLC"
+                                v-model="dlc" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" class="py-1">
+                            <ClearableSelectInput
+                                :options="filters.traits"
+                                label="Trait"
+                                v-model="trait" />
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col cols="12" class="py-1">
+                            <v-btn
+                                v-if="isFiltered"
+                                variant="outlined"
+                                class="clear-btn"
+                                @click="clear"
+                            >Clear all</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-navigation-drawer>
+
+            <v-row class="control-panel mt-5">
+                <v-col cols="9" class="px-3 py-0">
+                    <v-text-field
                         clearable
                         clear-icon="close"
+                        label="Search"
                         variant="underlined"
                         density="compact"
-                        label="Sort by"
-                        item-value="value"
-                        class="order-field"
-                        v-model="orderBy" />
+                        class="search-field"
+                        v-model="searchPhrase" />
                 </v-col>
-                <v-col cols="3" class="px-3 py-0">
-                    <ClearableSelectInput
-                        :options="filters.rarity"
-                        label="Rarity"
-                        v-model="rarity" />
-                </v-col>
-                <v-col cols="3" class="px-3 py-0">
-                    <ClearableSelectInput
-                        :options="filters.dlc"
-                        label="DLC"
-                        v-model="dlc" />
-                </v-col>
-                <v-col cols="3" class="px-3 py-0">
-                    <ClearableSelectInput
-                        :options="filters.traits"
-                        label="Traits"
-                        v-model="trait" />
+                <v-spacer></v-spacer>
+                <v-col cols="2" class="pl-0 pr-3 py-0 text-right">
+                    <v-btn
+                        color="#FFFEFB"
+                        icon="md:filter_alt"
+                        class="filters-icon-btn"
+                        @click.stop="showFilters = !showFilters"
+                    ></v-btn>
                 </v-col>
             </v-row>
-        </Transition>
+
+            <Transition name="slidedown">
+                <v-row v-if="isFiltered" justify="start" class="filters-panel pt-2">
+                    <v-col cols="12">
+                        <v-chip class="mr-2 mb-2" v-if="orderBy" closable @click:close="orderBy = null">
+                            <v-icon icon="md:sort" class="mr-1"></v-icon>{{ sortByOptions.find(item => item.value === orderBy).title }}
+                        </v-chip>
+                        <v-chip class="mr-2 mb-2" v-if="rarity" closable @click:close="rarity = null">
+                            Rarity: {{ rarity }}
+                        </v-chip>
+                        <v-chip class="mr-2 mb-2" v-if="dlc" closable @click:close="dlc = null">
+                            DLC: {{ dlc }}
+                        </v-chip>
+                        <v-chip class="mr-2 mb-2" v-if="trait" closable @click:close="trait = null">
+                            Trait: {{ trait }}
+                        </v-chip>
+                    </v-col>                 
+                </v-row>
+            </Transition>
+
+        </template>
+        <template v-else>
+            <v-row justify="start" class="control-panel mt-5">
+                <v-col cols="3" class="px-3 py-0">
+                    <v-text-field
+                        clearable
+                        clear-icon="close"
+                        label="Search"
+                        variant="underlined"
+                        density="compact"
+                        class="search-field"
+                        v-model="searchPhrase" />
+                </v-col>
+                <v-spacer />
+                <v-col cols="3" class="px-3 pt-2 pb-0 justify-end d-flex">
+                    <v-btn
+                        v-if="isFiltered"
+                        variant="outlined"
+                        class="clear-btn"
+                        @click="clear"
+                    >Clear all</v-btn>
+                    <v-btn
+                        v-if="showFilters"
+                        append-icon="expand_less"
+                        variant="outlined"
+                        class="filters-btn"
+                        @click="toggleFiltersPanel"
+                    >Hide filters</v-btn>
+                    <v-btn
+                        v-else
+                        append-icon="expand_more"
+                        variant="outlined"
+                        class="filters-btn"
+                        @click="toggleFiltersPanel"
+                    >Show filters</v-btn>
+                </v-col>
+            </v-row>
+            <Transition name="slidedown">
+                <v-row v-if="showFilters" justify="start" class="filters-panel pt-2">
+                    <v-col cols="3" class="px-3 py-0">
+                        <v-select
+                            :items="sortByOptions"
+                            clearable
+                            clear-icon="close"
+                            variant="underlined"
+                            density="compact"
+                            label="Sort by"
+                            item-value="value"
+                            class="order-field"
+                            v-model="orderBy" />
+                    </v-col>
+                    <v-col cols="3" class="px-3 py-0">
+                        <ClearableSelectInput
+                            :options="filters.rarity"
+                            label="Rarity"
+                            v-model="rarity" />
+                    </v-col>
+                    <v-col cols="3" class="px-3 py-0">
+                        <ClearableSelectInput
+                            :options="filters.dlc"
+                            label="DLC"
+                            v-model="dlc" />
+                    </v-col>
+                    <v-col cols="3" class="px-3 py-0">
+                        <ClearableSelectInput
+                            :options="filters.traits"
+                            label="Trait"
+                            v-model="trait" />
+                    </v-col>
+                </v-row>
+            </Transition>
+        </template>
 
         <DynamicScroller
             :items="itemsByChunks(itemsPerRow)"
@@ -231,10 +335,39 @@
 
     @media only screen 
         and (min-device-width: 320px) 
-        and (max-device-width: 480px)
-        and (-webkit-min-device-pixel-ratio: 2) {
+        and (max-device-width: 768px) {
         .items-row {
             grid-template-columns: 1fr;
+        }
+    }
+
+    @media only screen 
+        and (min-device-width: 480px) 
+        and (max-device-width: 960px) {
+        .search-field {
+            width: 42.5%;
+        }
+    }
+
+    @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 960px) {
+        .filters-icon-btn {
+            height: 3rem;
+            width: 3rem;
+            color: #968878;
+        }
+
+        .filters-drawer {
+            padding-top: 2.7rem;
+        }
+
+        .filters-panel {
+            margin-bottom: 0;
+        }
+
+        .filters-panel .v-chip {
+            text-transform: capitalize;
         }
     }
 

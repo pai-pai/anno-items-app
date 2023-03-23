@@ -1,18 +1,66 @@
 <script>
 import { RouterView } from "vue-router";
 import NavBar from "./components/NavBar.vue";
+import NavBarMobile from "./components/NavBarMobile.vue";
+import { useDisplay } from "vuetify";
 
 export default {
   name: "App",
   components: {
     NavBar,
-  }
+    NavBarMobile,
+  },
+  setup () {
+    const { mdAndDown } = useDisplay()
+
+    return { mdAndDown }
+  },
+  data: () => ({
+    overlay: false,
+  })
 };
 </script>
 
 <template>
   <v-app>
-    <v-app-bar app color="#574D44" extension-height="56">
+
+    <v-app-bar v-if="mdAndDown" app color="#574D44">
+      <v-app-bar-nav-icon
+        color="#FFFEFB"
+        variant="text"
+        @click="overlay = !overlay"
+        icon="$close"
+        v-if="overlay"
+      ></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        color="#FFFEFB"
+        variant="text"
+        @click="overlay = !overlay"
+        icon="$menu"
+        v-else
+      ></v-app-bar-nav-icon>
+      <v-toolbar-title>
+        <v-container class="header-text pa-0">
+          <router-link to="/"
+            ><h1>Anno 1800 Expeditions Helper</h1></router-link
+          >
+        </v-container>
+      </v-toolbar-title>
+
+      <v-overlay
+        v-model="overlay"
+        close-on-content-click
+        scroll-strategy="none"
+        scrim="false"
+        class="menu-overlay"
+        
+        location-strategy="connected"
+      >
+        <NavBarMobile />
+      </v-overlay>
+    </v-app-bar>
+
+    <v-app-bar v-else app color="#574D44" extension-height="56">
       <v-toolbar-title class="ml-0">
         <v-container class="header-text">
           <router-link to="/"
@@ -27,7 +75,7 @@ export default {
       </template>
     </v-app-bar>
 
-    <v-main class="primary-text-color background-color-light">
+    <v-main class="primary-text-color background-color-light" id="app-box">
       <RouterView />
     </v-main>
 
@@ -55,6 +103,7 @@ export default {
 .header-text a {
   text-decoration: none;
   color: #fffffb;
+  display: inline-block;
 }
 
 .header-text h1 {
@@ -62,8 +111,22 @@ export default {
   font-size: 1.5rem;
 }
 
+.menu-overlay {
+  top: 63px;
+  background-color: #574D44;
+}
+
 .v-footer a {
   color: #37A298;
+}
+
+@media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 480px)
+        and (orientation: portrait) {
+  .header-text h1 {
+    font-size: 1.4rem;
+  }
 }
 </style>
 

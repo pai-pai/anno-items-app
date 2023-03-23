@@ -1,16 +1,31 @@
 variables:
   IMAGE_NAME: dtoguzova/anno-items-vue
-  IMAGE_TAG: "1.0"
+  IMAGE_TAG: "1.0.1"
 
 
 stages:
   - build
 
-build_image:
+
+.build_image_tmpl:
   stage: build
   image: docker:23.0.1
   services:
     - docker:23.0.1-dind
+  script:
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+
+build_image:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  extends: .build_image_tmpl
+
+
+push_image:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+  extends: .build_image_tmpl
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:

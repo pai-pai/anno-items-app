@@ -1,4 +1,4 @@
-export const APIURL = import.meta.env.VITE_APIURL || "";
+export const APIURL = import.meta.env.VITE_APIURL || "/api";
 export const BONUSES_MAPPING = {
     "crafting": "Crafting",
     "diplomacy": "Diplomacy",
