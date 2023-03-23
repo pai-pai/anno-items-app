@@ -7,6 +7,9 @@ stages:
   - build
 
 build_image:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "master"
   stage: build
   image: docker:23.0.1
   services:
