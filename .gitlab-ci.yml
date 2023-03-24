@@ -25,6 +25,8 @@ build_image:
 push_image:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+      changes:
+        - Dockerfile
   extends: .build_image_tmpl
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
