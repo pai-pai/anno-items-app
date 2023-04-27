@@ -12,7 +12,7 @@ Main page:<br >
 <img src="https://pai-pai-github-images.s3.amazonaws.com/anno-items-app-main.png" alt="main-page" width="50%" height="50%">
 
 Equip an Expedition:<br >
-<img src="https://pai-pai-github-images.s3.amazonaws.com/anno-items-app-equip.png" alt="equip-page" width="50%" height="50%">
+<img src="https://pai-pai-github-images.s3.amazonaws.com/anno-items-app-equip-full.png" alt="equip-page" width="50%" height="50%">
 
 Supplies:<br >
 <img src="https://pai-pai-github-images.s3.amazonaws.com/anno-items-app-supplies.png" alt="equip-supplies" width="50%" height="50%">
